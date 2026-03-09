@@ -20,13 +20,25 @@
       <dt class="col-sm-3">Industry</dt>
       <dd class="col-sm-9">{{ customer.industry.sector }}{% if customer.industry.subsector %} / {{ customer.industry.subsector }}{% endif %}</dd>
       {% endif %}
+      {% if customer.industry and customer.industry.naics_code %}
+      <dt class="col-sm-3">NAICS Code</dt>
+      <dd class="col-sm-9">{{ customer.industry.naics_code }}</dd>
+      {% endif %}
       {% if customer.hq_country %}
       <dt class="col-sm-3">HQ Country</dt>
       <dd class="col-sm-9">{{ customer.hq_country }}</dd>
       {% endif %}
+      {% if customer.website_url %}
+      <dt class="col-sm-3">Website</dt>
+      <dd class="col-sm-9"><a href="{{ customer.website_url }}" target="_blank" rel="noopener noreferrer">{{ customer.website_url }}</a></dd>
+      {% endif %}
       {% if customer.employee_count %}
       <dt class="col-sm-3">Employees</dt>
       <dd class="col-sm-9">{{ customer.employee_count|intcomma }}</dd>
+      {% endif %}
+      {% if customer.contract_exp_date %}
+      <dt class="col-sm-3">Contract Expiry</dt>
+      <dd class="col-sm-9">{{ customer.contract_exp_date|date:"Y-m-d" }}</dd>
       {% endif %}
       {% if customer.contact_name %}
       <dt class="col-sm-3">Contact</dt>
@@ -95,6 +107,51 @@
   <a href="{% url 'customers:breach_list' customer.id %}" class="btn btn-sm btn-link">
     View all breach events &rarr;
   </a>
+</section>
+{% endif %}
+
+{% if likely_actors %}
+<section aria-labelledby="actors-heading" class="mt-4">
+  <h2 class="h5" id="actors-heading">Likely Threat Actors</h2>
+  <p class="text-muted small mb-2">
+    Industry-based assessment using MITRE ATT&amp;CK group targeting data.
+    Likelihood expressed using Words of Estimative Probability.
+  </p>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover" aria-label="Likely threat actors">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Actor</th>
+          <th scope="col">Likelihood</th>
+          <th scope="col">Basis</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in likely_actors %}
+        <tr>
+          <td>
+            <a href="{% url 'threats:actor_detail' item.actor.id %}">
+              {{ item.actor.name }}
+            </a>
+            {% if item.actor.mitre_group_id %}
+            <span class="text-muted small">({{ item.actor.mitre_group_id }})</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if item.wep == "Highly Likely" %}
+            <span class="badge bg-danger">Highly Likely</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">Likely</span>
+            {% endif %}
+          </td>
+          <td class="small text-muted">
+            Industry match{% if item.country_match %}, country match{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endif %}
 {% endblock %}

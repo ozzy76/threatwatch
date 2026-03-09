@@ -25,10 +25,10 @@ steps:
       - '--memory=1Gi'
       - '--cpu=1'
       - '--timeout=300'
-      - '--set-env-vars=DJANGO_SETTINGS_MODULE=config.settings.production'
-      - '--set-secrets=SECRET_KEY=django-secret-key:latest,MONGODB_URI=mongodb-uri:latest'
-      - '--vpc-connector=mtw-connector'
-      - '--vpc-egress=private-ranges-only'
+      - '--set-env-vars=^|^DJANGO_SETTINGS_MODULE=config.settings.production|ALLOWED_HOSTS=.a.run.app,.bedrockintel.com|GCS_BUCKET_NAME=mergethreatwatch-reports'
+      - '--set-secrets=SECRET_KEY=MTW_APP_SECRET_KEY:latest,MONGODB_URI=mtw-mongodb-URI:latest,REDIS_URL=redis-url:latest'
+      - '--vpc-connector=mtw-app-access'
+      - '--vpc-egress=all-traffic'
       - '--allow-unauthenticated'
 
 images:

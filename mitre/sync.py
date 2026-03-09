@@ -4,6 +4,84 @@ Upserts ThreatActor.known_techniques and Campaign documents from MITRE ATT&CK.
 """
 import datetime
 import logging
+import re
+
+_SECTOR_KEYWORDS = {
+    r"government": "Government",
+    r"public sector": "Government",
+    r"public administration": "Government",
+    r"military": "Defense",
+    r"defense": "Defense",
+    r"defence": "Defense",
+    r"aerospace": "Aerospace & Defense",
+    r"financial": "Financial Services",
+    r"banking": "Financial Services",
+    r"finance sector": "Financial Services",
+    r"insurance": "Financial Services",
+    r"investment": "Financial Services",
+    r"healthcare": "Healthcare",
+    r"hospital": "Healthcare",
+    r"medical": "Healthcare",
+    r"pharmaceutical": "Healthcare",
+    r"biotech": "Healthcare",
+    r"clinical": "Healthcare",
+    r"\benergy\b": "Energy",
+    r"oil and gas": "Energy",
+    r"utilities": "Energy",
+    r"power grid": "Energy",
+    r"nuclear": "Energy",
+    r"renewable energy": "Energy",
+    r"technology": "Technology",
+    r"high.tech": "Technology",
+    r"software": "Technology",
+    r"\bit sector": "Technology",
+    r"information technology": "Technology",
+    r"semiconductor": "Technology",
+    r"telecom": "Telecommunications",
+    r"telecommunications": "Telecommunications",
+    r"wireless carrier": "Telecommunications",
+    r"education": "Education",
+    r"university": "Education",
+    r"academic": "Education",
+    r"research institute": "Education",
+    r"think tank": "Think Tank / NGO",
+    r"non.governmental": "Think Tank / NGO",
+    r"\bngo\b": "Think Tank / NGO",
+    r"civil society": "Think Tank / NGO",
+    r"nonprofit": "Think Tank / NGO",
+    r"media": "Media",
+    r"entertainment": "Media",
+    r"broadcast": "Media",
+    r"journalism": "Media",
+    r"transport": "Transportation",
+    r"logistics": "Transportation",
+    r"shipping": "Transportation",
+    r"aviation": "Transportation",
+    r"maritime": "Transportation",
+    r"manufacturing": "Manufacturing",
+    r"industrial": "Manufacturing",
+    r"retail": "Retail",
+    r"e.commerce": "Retail",
+    r"critical infrastructure": "Critical Infrastructure",
+    r"professional services": "Professional Services",
+    r"consulting": "Professional Services",
+    r"law firm": "Professional Services",
+    r"legal services": "Professional Services",
+    r"accounting firm": "Professional Services",
+    r"staffing": "Professional Services",
+    r"human resources": "Professional Services",
+    r"managed service": "Professional Services",
+}
+
+
+def _extract_sectors(description: str) -> list[str]:
+    """Return a deduplicated list of sector names detected in the description."""
+    text = (description or "").lower()
+    found = []
+    for pattern, sector in _SECTOR_KEYWORDS.items():
+        if re.search(pattern, text) and sector not in found:
+            found.append(sector)
+    return found
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +147,15 @@ def sync_actors(mitre_client, stdout=None):
             if ref_dict["technique_id"]:
                 tech_refs.append(MitreTechniqueRef(**ref_dict))
 
+        sectors = _extract_sectors(description)
+
         existing = ThreatActor.objects(mitre_group_id=mitre_id).first()
         if existing:
             existing.name = name
             existing.aliases = [a for a in aliases if a != name]
             existing.description = description
             existing.known_techniques = tech_refs
+            existing.target_industries = sectors
             existing.updated_at = _now()
             existing.save()
             updated += 1
@@ -85,6 +166,7 @@ def sync_actors(mitre_client, stdout=None):
                 mitre_group_id=mitre_id,
                 description=description,
                 known_techniques=tech_refs,
+                target_industries=sectors,
                 is_active=True,
                 created_at=_now(),
                 updated_at=_now(),

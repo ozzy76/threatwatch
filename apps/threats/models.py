@@ -27,7 +27,7 @@ class ThreatActor(Document):
 
     meta = {
         "collection": "threats_threatactor",
-        "indexes": ["name", "mitre_group_id", "is_active"],
+        "indexes": ["name", "mitre_group_id", "is_active", "target_industries"],
         "ordering": ["name"],
     }
 
