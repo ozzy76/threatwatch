@@ -37,8 +37,17 @@ def _get_allowed_customer(user, customer_id):
 
 @login_required
 def customer_list(request):
-    customers = _allowed_customers(request.user).order_by("name")
-    return render(request, "customers/customer_list.html", {"customers": customers})
+    qs = _allowed_customers(request.user)
+    breach_filter = request.GET.get("breach", "")
+    if breach_filter == "yes":
+        qs = qs.filter(has_known_breach=True)
+    elif breach_filter == "no":
+        qs = qs.filter(has_known_breach=False)
+    customers = qs.order_by("name")
+    return render(request, "customers/customer_list.html", {
+        "customers": customers,
+        "breach_filter": breach_filter,
+    })
 
 
 @login_required

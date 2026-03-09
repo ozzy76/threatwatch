@@ -13,6 +13,21 @@
 <a href="{% url 'customers:customer_create' %}" class="btn btn-success mb-3">+ New Customer</a>
 {% endif %}
 
+<!-- Breach filter -->
+<div class="mb-3">
+  <div class="btn-group" role="group" aria-label="Breach filter">
+    <a href="?" class="btn btn-sm {% if breach_filter == '' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+      All
+    </a>
+    <a href="?breach=yes" class="btn btn-sm {% if breach_filter == 'yes' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+      Known Breach
+    </a>
+    <a href="?breach=no" class="btn btn-sm {% if breach_filter == 'no' %}btn-success{% else %}btn-outline-success{% endif %}">
+      No Breach
+    </a>
+  </div>
+</div>
+
 {% if customers %}
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
   {% for customer in customers %}

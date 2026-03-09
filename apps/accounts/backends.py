@@ -1,7 +1,11 @@
 import logging
+from django.contrib.auth.hashers import make_password, check_password as django_check_password
 from .models import User
 
 logger = logging.getLogger(__name__)
+
+# Computed once at import time; used to equalise timing on unknown-user path
+_DUMMY_HASH = make_password("!")
 
 
 class MongoEngineBackend:
@@ -13,6 +17,9 @@ class MongoEngineBackend:
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
+            # Constant-time path: run a full hash comparison to match
+            # the timing of a real password check, preventing username enumeration
+            django_check_password(password or "", _DUMMY_HASH)
             logger.warning("Login attempt for unknown user: %s", username)
             return None
 

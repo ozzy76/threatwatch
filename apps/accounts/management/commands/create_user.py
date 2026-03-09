@@ -1,5 +1,7 @@
 import getpass
 import datetime
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from apps.accounts.models import User, ROLE_ANALYST, ROLE_ADMIN
 
@@ -31,6 +33,11 @@ class Command(BaseCommand):
         confirm = getpass.getpass("Confirm password: ")
         if password != confirm:
             raise CommandError("Passwords do not match.")
+
+        try:
+            validate_password(password)
+        except ValidationError as exc:
+            raise CommandError("; ".join(exc.messages))
 
         user = User(
             username=username,

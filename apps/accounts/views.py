@@ -1,6 +1,7 @@
 import logging
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.core.cache import cache
 from django.conf import settings
@@ -18,7 +19,7 @@ LOCKOUT_SECONDS = 900  # 15 minutes
 
 def _ip(request):
     xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    return xff.split(",")[0].strip() if xff else request.META.get("REMOTE_ADDR", "unknown")
+    return xff.split(",")[-1].strip() if xff else request.META.get("REMOTE_ADDR", "unknown")
 
 
 def _lockout_key(ip):
@@ -55,7 +56,9 @@ def login_view(request):
                 # Update last_login
                 user.last_login = datetime.datetime.now(datetime.timezone.utc)
                 user.save()
-                next_url = request.GET.get("next", settings.LOGIN_REDIRECT_URL)
+                next_url = request.GET.get("next", "")
+                if not url_has_allowed_host_and_scheme(url=next_url, allowed_hosts={request.get_host()}):
+                    next_url = settings.LOGIN_REDIRECT_URL
                 return redirect(next_url)
             else:
                 new_count = failures + 1

@@ -1,5 +1,7 @@
 import datetime
 from django import forms
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from apps.accounts.models import User, ROLE_ANALYST, ROLE_ADMIN
 
 
@@ -38,7 +40,7 @@ class UserCreateForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-select"}),
     )
     password = forms.CharField(
-        min_length=8,
+        min_length=12,
         label="Password",
         widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "new-password"}),
     )
@@ -65,4 +67,9 @@ class UserCreateForm(forms.Form):
         pw2 = cleaned.get("password_confirm")
         if pw and pw2 and pw != pw2:
             self.add_error("password_confirm", "Passwords do not match.")
+        if pw:
+            try:
+                validate_password(pw)
+            except DjangoValidationError as exc:
+                self.add_error("password", exc)
         return cleaned
