@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Detections — {{ customer.name }} — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Customers</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer.name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Detections</li>
+  </ol>
+</nav>
+
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3">Detection Recommendations — {{ customer.name }}</h1>
+    <p class="text-muted">
+      Based on {{ actors|length }} associated threat actor(s) using
+      {{ technique_ids|length }} MITRE ATT&amp;CK technique(s).
+    </p>
+  </div>
+</div>
+
+{% if actors %}
+<div class="mb-3">
+  <strong>Associated Actors:</strong>
+  {% for actor in actors %}
+  <a href="{% url 'threats:actor_detail' actor.id %}" class="badge bg-danger text-decoration-none me-1">
+    {{ actor.name }}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if detections %}
+<div class="row row-cols-1 g-3">
+  {% for detection in detections %}
+  <div class="col">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h2 class="h6 card-title mb-0">{{ detection.title }}</h2>
+          <div class="d-flex gap-2">
+            <span class="badge badge-{{ detection.severity }}">{{ detection.severity|title }}</span>
+            <span class="badge bg-secondary">Priority {{ detection.priority }}</span>
+          </div>
+        </div>
+        <div class="priority-bar mb-2" style="width: {{ detection.priority }}%;" role="progressbar"
+             aria-valuenow="{{ detection.priority }}" aria-valuemin="0" aria-valuemax="100"
+             aria-label="Priority {{ detection.priority }} of 100">
+        </div>
+        {% if detection.description %}
+        <p class="card-text small">{{ detection.description }}</p>
+        {% endif %}
+        <div class="d-flex flex-wrap gap-1 mt-2">
+          {% for tid in detection.technique_ids %}
+          <code class="small">{{ tid }}</code>
+          {% endfor %}
+          {% if detection.platform %}
+          <span class="badge bg-info text-dark">{{ detection.platform }}</span>
+          {% endif %}
+          {% if detection.data_source %}
+          <span class="badge bg-light text-dark border">{{ detection.data_source }}</span>
+          {% endif %}
+        </div>
+        {% if detection.detection_logic %}
+        <details class="mt-2">
+          <summary class="small text-muted">Detection Logic</summary>
+          <pre class="small mt-1 p-2 bg-light border rounded"><code>{{ detection.detection_logic }}</code></pre>
+        </details>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+  {% if technique_ids %}
+  No detection recommendations found for the associated techniques.
+  {% else %}
+  No threat actors are associated with this customer. Contact your administrator.
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

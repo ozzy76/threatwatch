@@ -1,0 +1,14 @@
+2026mtw/
+*.pyc
+__pycache__/
+.env
+.env.*
+!.env.example
+*.log
+staticfiles/
+media/
+.git/
+.gitignore
+*.md
+tests/
+.pytest_cache/

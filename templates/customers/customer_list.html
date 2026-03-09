@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Customers — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3">Customer Profiles</h1>
+    <p class="text-muted">Showing {{ customers|length }} customer(s) assigned to your account.</p>
+  </div>
+</div>
+
+{% if request.user.role == "admin" %}
+<a href="{% url 'customers:customer_create' %}" class="btn btn-success mb-3">+ New Customer</a>
+{% endif %}
+
+{% if customers %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+  {% for customer in customers %}
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 card-title">
+          <a href="{% url 'customers:customer_detail' customer.id %}" class="text-decoration-none stretched-link">
+            {{ customer.name }}
+          </a>
+        </h2>
+        <p class="text-muted small mb-1">
+          {% if customer.industry %}{{ customer.industry.sector }}{% endif %}
+          {% if customer.hq_country %}&mdash; {{ customer.hq_country }}{% endif %}
+        </p>
+        <p class="card-text small">{{ customer.description|truncatechars:120 }}</p>
+      </div>
+      <div class="card-footer bg-transparent d-flex gap-2">
+        <a href="{% url 'customers:breach_list' customer.id %}" class="btn btn-sm btn-outline-danger">
+          Breach Events
+        </a>
+        <a href="{% url 'detections:customer_detections' customer.id %}" class="btn btn-sm btn-outline-warning">
+          Detections
+        </a>
+        <a href="{% url 'reports:report_history' customer.id %}" class="btn btn-sm btn-outline-secondary">
+          Reports
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+  No customers are currently assigned to your account. Contact your administrator.
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{{ actor.name }} — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'threats:actor_list' %}">Threat Actors</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ actor.name }}</li>
+  </ol>
+</nav>
+
+<div class="row mb-4">
+  <div class="col-lg-8">
+    <h1 class="h3">
+      {{ actor.name }}
+      {% if actor.mitre_group_id %}
+      <span class="badge bg-dark fs-6">{{ actor.mitre_group_id }}</span>
+      {% endif %}
+    </h1>
+    {% if actor.aliases %}
+    <p class="text-muted">Also known as: <em>{{ actor.aliases|join:", " }}</em></p>
+    {% endif %}
+
+    <dl class="row small">
+      {% if actor.origin_country %}
+      <dt class="col-sm-3">Origin Country</dt>
+      <dd class="col-sm-9">{{ actor.origin_country }}</dd>
+      {% endif %}
+      {% if actor.motivation %}
+      <dt class="col-sm-3">Motivation</dt>
+      <dd class="col-sm-9">{{ actor.motivation }}</dd>
+      {% endif %}
+      {% if actor.first_seen %}
+      <dt class="col-sm-3">First Seen</dt>
+      <dd class="col-sm-9">{{ actor.first_seen|date:"Y" }}</dd>
+      {% endif %}
+      {% if actor.last_seen %}
+      <dt class="col-sm-3">Last Seen</dt>
+      <dd class="col-sm-9">{{ actor.last_seen|date:"Y" }}</dd>
+      {% endif %}
+      {% if actor.target_industries %}
+      <dt class="col-sm-3">Target Industries</dt>
+      <dd class="col-sm-9">{{ actor.target_industries|join:", " }}</dd>
+      {% endif %}
+      {% if actor.target_countries %}
+      <dt class="col-sm-3">Target Countries</dt>
+      <dd class="col-sm-9">{{ actor.target_countries|join:", " }}</dd>
+      {% endif %}
+    </dl>
+
+    {% if actor.description %}
+    <p>{{ actor.description }}</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if actor.known_techniques %}
+<section aria-labelledby="techniques-heading" class="mb-4">
+  <h2 class="h5" id="techniques-heading">Known Techniques ({{ actor.known_techniques|length }})</h2>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover" aria-label="MITRE ATT&CK techniques">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Tactic</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tech in actor.known_techniques %}
+        <tr>
+          <td><code>{{ tech.technique_id }}</code></td>
+          <td>
+            {% if tech.url %}
+            <a href="{{ tech.url }}" target="_blank" rel="noopener noreferrer">{{ tech.name }}</a>
+            {% else %}
+            {{ tech.name }}
+            {% endif %}
+          </td>
+          <td>{{ tech.tactic|default:"&mdash;" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if campaigns %}
+<section aria-labelledby="campaigns-heading">
+  <h2 class="h5" id="campaigns-heading">Campaigns</h2>
+  <ul class="list-group">
+    {% for campaign in campaigns %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <a href="{% url 'threats:campaign_detail' actor.id campaign.id %}">{{ campaign.name }}</a>
+      {% if campaign.mitre_campaign_id %}
+      <span class="badge bg-secondary">{{ campaign.mitre_campaign_id }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

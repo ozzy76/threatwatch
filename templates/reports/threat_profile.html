@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Threat Intelligence Profile — {{ customer.name }}</title>
+  <style>
+    /* WeasyPrint PDF stylesheet */
+    @page {
+      size: A4;
+      margin: 2cm 2.5cm;
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 9pt; }
+    }
+
+    body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 10pt; color: #1a1a2e; line-height: 1.5; }
+    h1 { font-size: 20pt; color: #0d1b2a; border-bottom: 2px solid #c0392b; padding-bottom: 0.3cm; }
+    h2 { font-size: 14pt; color: #0d1b2a; border-bottom: 1px solid #ccc; margin-top: 1cm; }
+    h3 { font-size: 11pt; color: #c0392b; }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.4cm; font-size: 9pt; }
+    th { background-color: #0d1b2a; color: white; padding: 6px 8px; text-align: left; }
+    td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; }
+    tr:nth-child(even) td { background-color: #f7f7f7; }
+    .cover { text-align: center; margin-top: 4cm; }
+    .cover h1 { font-size: 24pt; border: none; }
+    .cover .subtitle { font-size: 14pt; color: #555; margin-top: 0.5cm; }
+    .cover .meta { font-size: 10pt; color: #888; margin-top: 2cm; }
+    .badge-critical { color: #c0392b; font-weight: bold; }
+    .badge-high { color: #e67e22; font-weight: bold; }
+    .badge-medium { color: #f39c12; }
+    .badge-low { color: #27ae60; }
+    .page-break { page-break-after: always; }
+    .section { margin-top: 0.8cm; }
+    code { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; background: #f0f0f0; padding: 1px 3px; }
+    .toc li { list-style: none; padding: 3px 0; border-bottom: 1px dotted #ccc; }
+    .toc { padding-left: 0; }
+  </style>
+</head>
+<body>
+
+<!-- Cover page -->
+<div class="cover">
+  <h1>&#128274; Threat Intelligence Profile</h1>
+  <div class="subtitle">{{ customer.name }}</div>
+  <div class="meta">
+    <p>Generated: {% now "Y-m-d H:i" %} UTC</p>
+    <p>Prepared by: {{ generated_by.first_name }} {{ generated_by.last_name }} ({{ generated_by.username }})</p>
+    <p>Classification: CONFIDENTIAL</p>
+  </div>
+</div>
+<div class="page-break"></div>
+
+<!-- Executive Summary -->
+<section class="section" aria-labelledby="exec-summary">
+  <h2 id="exec-summary">Executive Summary</h2>
+  <p>This threat intelligence profile provides an assessment of the cyber threat landscape
+  facing <strong>{{ customer.name }}</strong>. The report covers {{ actors|length }} identified
+  threat actor group(s), {{ breaches|length }} recorded breach event(s), and
+  {{ detections|length }} prioritised detection recommendation(s).</p>
+
+  {% if customer.description %}<p>{{ customer.description }}</p>{% endif %}
+
+  <table>
+    <tr><th>Attribute</th><th>Value</th></tr>
+    {% if customer.industry %}<tr><td>Industry</td><td>{{ customer.industry.sector }}</td></tr>{% endif %}
+    {% if customer.hq_country %}<tr><td>HQ Country</td><td>{{ customer.hq_country }}</td></tr>{% endif %}
+    {% if customer.employee_count %}<tr><td>Employee Count</td><td>{{ customer.employee_count }}</td></tr>{% endif %}
+    <tr><td>Associated Threat Actors</td><td>{{ actors|length }}</td></tr>
+    <tr><td>Recorded Breach Events</td><td>{{ breaches|length }}</td></tr>
+    <tr><td>Detection Recommendations</td><td>{{ detections|length }}</td></tr>
+    <tr><td>MITRE ATT&amp;CK Techniques Tracked</td><td>{{ technique_ids|length }}</td></tr>
+  </table>
+</section>
+
+<!-- Threat Actors -->
+{% if actors %}
+<div class="page-break"></div>
+<section class="section" aria-labelledby="threat-actors">
+  <h2 id="threat-actors">Threat Actor Groups</h2>
+  {% for actor in actors %}
+  <div>
+    <h3>{{ actor.name }} {% if actor.mitre_group_id %}({{ actor.mitre_group_id }}){% endif %}</h3>
+    {% if actor.aliases %}<p><em>Aliases:</em> {{ actor.aliases|join:", " }}</p>{% endif %}
+    {% if actor.origin_country %}<p><em>Origin:</em> {{ actor.origin_country }}</p>{% endif %}
+    {% if actor.motivation %}<p><em>Motivation:</em> {{ actor.motivation }}</p>{% endif %}
+    {% if actor.description %}<p>{{ actor.description|truncatechars:500 }}</p>{% endif %}
+    {% if actor.known_techniques %}
+    <table>
+      <thead><tr><th>Technique ID</th><th>Name</th><th>Tactic</th></tr></thead>
+      <tbody>
+        {% for tech in actor.known_techniques %}
+        <tr>
+          <td><code>{{ tech.technique_id }}</code></td>
+          <td>{{ tech.name }}</td>
+          <td>{{ tech.tactic }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<!-- Breach Events -->
+{% if breaches %}
+<div class="page-break"></div>
+<section class="section" aria-labelledby="breach-events">
+  <h2 id="breach-events">Breach Events</h2>
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Severity</th><th>Data Types</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {% for breach in breaches %}
+      <tr>
+        <td>{{ breach.breach_date|date:"Y-m-d" }}</td>
+        <td class="badge-{{ breach.severity }}">{{ breach.severity|title }}</td>
+        <td>{{ breach.data_types_compromised|join:", " }}</td>
+        <td>{{ breach.description|truncatechars:200 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<!-- Detection Recommendations -->
+{% if detections %}
+<div class="page-break"></div>
+<section class="section" aria-labelledby="detections">
+  <h2 id="detections">Detection Recommendations</h2>
+  <table>
+    <thead>
+      <tr><th>Priority</th><th>Severity</th><th>Title</th><th>Techniques</th><th>Platform</th></tr>
+    </thead>
+    <tbody>
+      {% for det in detections %}
+      <tr>
+        <td>{{ det.priority }}</td>
+        <td class="badge-{{ det.severity }}">{{ det.severity|title }}</td>
+        <td>{{ det.title }}</td>
+        <td>{{ det.technique_ids|join:", " }}</td>
+        <td>{{ det.platform|default:"" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<!-- Disclaimer -->
+<div class="page-break"></div>
+<section class="section">
+  <h2>Disclaimer</h2>
+  <p>This report is generated from threat intelligence data aggregated by MergeThreatWatch
+  and is intended solely for the named customer's internal security operations. The
+  information is provided "as-is" and should be used in conjunction with other security
+  measures. MITRE ATT&amp;CK® is a registered trademark of The MITRE Corporation.</p>
+</section>
+
+</body>
+</html>

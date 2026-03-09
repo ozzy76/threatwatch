@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Login — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white text-center py-3">
+        <h1 class="h4 mb-0">&#128274; MergeThreatWatch</h1>
+        <p class="mb-0 small text-light">Threat Intelligence Platform</p>
+      </div>
+      <div class="card-body p-4">
+        {% if lockout %}
+        <div class="alert alert-danger" role="alert">
+          Too many failed login attempts. Please try again in 15 minutes.
+        </div>
+        {% else %}
+        <h2 class="h5 mb-4 text-center">Sign In</h2>
+        <form method="post" action="{% url 'accounts:login' %}" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+            <div class="text-danger small">{{ form.username.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+            <div class="text-danger small">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    <p class="text-center text-muted small mt-3">
+      Access is restricted to authorised analysts only.
+    </p>
+  </div>
+</div>
+{% endblock %}

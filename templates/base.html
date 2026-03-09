@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MergeThreatWatch{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mtw.css' %}">
+</head>
+<body>
+  <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
+
+  <header role="banner">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Primary navigation">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/">&#128274; MergeThreatWatch</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarMain" aria-controls="navbarMain"
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+          {% if request.user.is_authenticated %}
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Customers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/threats/actors/">Threat Actors</a>
+            </li>
+            {% if request.user.role == "admin" %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:user_list' %}">Users</a>
+            </li>
+            {% endif %}
+          </ul>
+          <div class="d-flex align-items-center">
+            <span class="text-light me-3">{{ request.user.username }}</span>
+            <form method="post" action="/accounts/logout/" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content" role="main" class="container-fluid py-4">
+    {% if messages %}
+    <div aria-live="polite" aria-atomic="true">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer role="contentinfo" class="bg-dark text-light py-3 mt-auto">
+    <div class="container-fluid text-center">
+      <small>&copy; 2026 MergeThreatWatch &mdash; Threat Intelligence Platform</small>
+    </div>
+  </footer>
+
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

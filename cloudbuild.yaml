@@ -1,0 +1,38 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'mergethreatwatch'
+      - '--image=us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+      - '--region=us-west1'
+      - '--platform=managed'
+      - '--min-instances=1'
+      - '--max-instances=10'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--timeout=300'
+      - '--set-env-vars=DJANGO_SETTINGS_MODULE=config.settings.production'
+      - '--set-secrets=SECRET_KEY=django-secret-key:latest,MONGODB_URI=mongodb-uri:latest'
+      - '--vpc-connector=mtw-connector'
+      - '--vpc-egress=private-ranges-only'
+      - '--allow-unauthenticated'
+
+images:
+  - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

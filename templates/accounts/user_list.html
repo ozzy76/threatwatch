@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Users — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <h1 class="h3">Users</h1>
+  </div>
+  <div class="col-auto">
+    <a href="{% url 'accounts:user_create' %}" class="btn btn-success">+ New User</a>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped table-sm align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+        <th scope="col">Active</th>
+        <th scope="col">Date Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>
+          {% if user.role == "admin" %}
+          <span class="badge bg-danger">Admin</span>
+          {% else %}
+          <span class="badge bg-secondary">Analyst</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if user.is_active %}
+          <span class="badge bg-success">Yes</span>
+          {% else %}
+          <span class="badge bg-warning text-dark">No</span>
+          {% endif %}
+        </td>
+        <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center text-muted">No users found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

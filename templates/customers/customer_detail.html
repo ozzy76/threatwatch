@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ customer.name }} — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Customers</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ customer.name }}</li>
+  </ol>
+</nav>
+
+<div class="row mb-4">
+  <div class="col-lg-8">
+    <h1 class="h3">{{ customer.name }}</h1>
+    <dl class="row small">
+      <dt class="col-sm-3">Short Name</dt>
+      <dd class="col-sm-9">{{ customer.short_name }}</dd>
+      {% if customer.industry %}
+      <dt class="col-sm-3">Industry</dt>
+      <dd class="col-sm-9">{{ customer.industry.sector }}{% if customer.industry.subsector %} / {{ customer.industry.subsector }}{% endif %}</dd>
+      {% endif %}
+      {% if customer.hq_country %}
+      <dt class="col-sm-3">HQ Country</dt>
+      <dd class="col-sm-9">{{ customer.hq_country }}</dd>
+      {% endif %}
+      {% if customer.employee_count %}
+      <dt class="col-sm-3">Employees</dt>
+      <dd class="col-sm-9">{{ customer.employee_count|intcomma }}</dd>
+      {% endif %}
+      {% if customer.contact_name %}
+      <dt class="col-sm-3">Contact</dt>
+      <dd class="col-sm-9">{{ customer.contact_name }} &lt;{{ customer.contact_email }}&gt;</dd>
+      {% endif %}
+    </dl>
+    {% if customer.description %}
+    <p>{{ customer.description }}</p>
+    {% endif %}
+  </div>
+  <div class="col-lg-4 d-flex flex-column gap-2 align-items-start">
+    {% if request.user.role == "admin" %}
+    <a href="{% url 'customers:customer_edit' customer.id %}" class="btn btn-outline-primary">
+      Edit Customer
+    </a>
+    <form method="post" action="{% url 'customers:customer_delete' customer.id %}"
+          onsubmit="return confirm('Soft-delete this customer?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger">Delete Customer</button>
+    </form>
+    {% endif %}
+    {% if customer.has_known_breach %}
+    <span class="badge bg-danger">Known Data Breach</span>
+    {% endif %}
+    <a href="{% url 'customers:breach_list' customer.id %}" class="btn btn-outline-danger">
+      View Breach Events
+    </a>
+    <a href="{% url 'detections:customer_detections' customer.id %}" class="btn btn-outline-warning">
+      View Detections
+    </a>
+    <a href="{% url 'reports:report_history' customer.id %}" class="btn btn-outline-secondary">
+      Report History
+    </a>
+    <form method="post" action="{% url 'reports:generate_report' customer.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Generate PDF Report</button>
+    </form>
+  </div>
+</div>
+
+{% if recent_breaches %}
+<section aria-labelledby="breaches-heading">
+  <h2 class="h5" id="breaches-heading">Recent Breach Events</h2>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm" aria-label="Recent breaches">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Severity</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for breach in recent_breaches %}
+        <tr>
+          <td>{{ breach.breach_date|date:"Y-m-d" }}</td>
+          <td>
+            <span class="badge badge-{{ breach.severity }}">{{ breach.severity|title }}</span>
+          </td>
+          <td>{{ breach.description|truncatechars:100 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{% url 'customers:breach_list' customer.id %}" class="btn btn-sm btn-link">
+    View all breach events &rarr;
+  </a>
+</section>
+{% endif %}
+{% endblock %}

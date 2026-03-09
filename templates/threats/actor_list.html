@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Threat Actors — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Threat Actor Groups</h1>
+
+{% if actors %}
+<div class="row row-cols-1 row-cols-md-2 g-4">
+  {% for actor in actors %}
+  <div class="col">
+    <div class="card h-100 shadow-sm actor-card">
+      <div class="card-body">
+        <h2 class="h5 card-title">
+          <a href="{% url 'threats:actor_detail' actor.id %}" class="text-decoration-none stretched-link">
+            {{ actor.name }}
+          </a>
+        </h2>
+        {% if actor.mitre_group_id %}
+        <span class="badge bg-dark mb-1">{{ actor.mitre_group_id }}</span>
+        {% endif %}
+        {% if actor.aliases %}
+        <p class="small text-muted mb-1">Also known as: {{ actor.aliases|join:", " }}</p>
+        {% endif %}
+        {% if actor.origin_country %}
+        <p class="small mb-1"><strong>Origin:</strong> {{ actor.origin_country }}</p>
+        {% endif %}
+        {% if actor.motivation %}
+        <p class="small mb-1"><strong>Motivation:</strong> {{ actor.motivation }}</p>
+        {% endif %}
+        <p class="card-text small">{{ actor.description|truncatechars:150 }}</p>
+      </div>
+      <div class="card-footer bg-transparent small text-muted">
+        {{ actor.known_techniques|length }} technique(s) &bull;
+        {% if actor.target_industries %}Targets: {{ actor.target_industries|join:", "|truncatechars:60 }}{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+  No threat actors have been loaded yet. Run <code>python manage.py sync_mitre</code> to populate data.
+</div>
+{% endif %}
+{% endblock %}
