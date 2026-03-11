@@ -1,0 +1,32 @@
+# Python virtualenv
+2026mtw/
+
+# Compiled Python
+*.pyc
+__pycache__/
+
+# Secrets — never upload
+.env
+.env.*
+!.env.example
+
+# Build artefacts (re-created inside Docker at build time)
+staticfiles/
+media/
+
+# Version control
+.git/
+.gitignore
+
+# Docs and noise
+*.md
+.claude/
+*.log
+
+# Tests
+tests/
+.pytest_cache/
+
+# OS / IDE
+.DS_Store
+*.swp

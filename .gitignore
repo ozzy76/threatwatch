@@ -1,0 +1,21 @@
+# Environment variables (most common culprit)
+.env
+.env.local
+.env.production
+
+# AWS credentials
+.aws/
+
+# SSH keys
+.ssh/
+
+# macOS junk
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
+
+# Docs and noise
+.claude/
+.claude/settings.local.json
