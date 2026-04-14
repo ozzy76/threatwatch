@@ -1,4 +1,4 @@
-# MergeThreatWatch
+# ThreatWatch
 
 A threat intelligence platform that contextualizes cybersecurity risk at the customer level — built to demonstrate how technology can turn raw threat data into actionable business insight.
 
@@ -6,7 +6,7 @@ A threat intelligence platform that contextualizes cybersecurity risk at the cus
 
 ## Origin
 
-This project was built as part of the interview process for [Merge](https://merge.dev), a unified API platform serving B2B SaaS companies. The goal was to show how software can bridge the gap between technical threat intelligence and the business conversations that matter most — customer renewals, prospect research, and proactive risk communication.
+This project was built to help with customer renewals, prospect research, and proactive risk communication.
 
 The core question it answers: *"Given what we know about this customer — their industry, their country, their breach history — which threat actors should we be most concerned about, and what should we be doing about it?"*
 
@@ -14,7 +14,7 @@ The core question it answers: *"Given what we know about this customer — their
 
 ## What It Does
 
-MergeThreatWatch is a private web application for analyst teams. It ingests threat actor and campaign data from the [MITRE ATT&CK framework](https://attack.mitre.org/) and maps it against a portfolio of customers to surface relevant, prioritized risk.
+ThreatWatch is a private web application for analyst teams. It ingests threat actor and campaign data from the [MITRE ATT&CK framework](https://attack.mitre.org/) and maps it against a portfolio of customers to surface relevant, prioritized risk.
 
 ### Customer Risk Profiles
 
@@ -110,8 +110,8 @@ mitre/
 
 ```bash
 # Clone and enter the project
-git clone https://github.com/YOUR_ORG/mergethreatwatch.git
-cd mergethreatwatch
+git clone https://github.com/YOUR_ORG/threatwatch.git
+cd threatwatch
 
 # Create and activate a virtual environment (Python 3.14+)
 python3.14 -m venv 2026mtw

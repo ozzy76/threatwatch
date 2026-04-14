@@ -138,7 +138,7 @@ CONTENT_SECURITY_POLICY = {
 }
 
 # --- GCS ---
-GCS_BUCKET_NAME = config("GCS_BUCKET_NAME", default="mergethreatwatch-reports")
+GCS_BUCKET_NAME = config("GCS_BUCKET_NAME", default="threatwatch-reports")
 
 # --- Logging ---
 LOGGING = {

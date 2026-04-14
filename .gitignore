@@ -19,3 +19,9 @@
 # Docs and noise
 .claude/
 .claude/settings.local.json
+
+# Research and data files
+*.csv
+
+# Deployment scripts (contain environment-specific values)
+scripts/

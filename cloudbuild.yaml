@@ -3,21 +3,21 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+      - 'us-west1-docker.pkg.dev/$PROJECT_ID/threatwatch/app:$COMMIT_SHA'
       - '.'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+      - 'us-west1-docker.pkg.dev/$PROJECT_ID/threatwatch/app:$COMMIT_SHA'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'mergethreatwatch'
-      - '--image=us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+      - 'threatwatch'
+      - '--image=us-west1-docker.pkg.dev/$PROJECT_ID/threatwatch/app:$COMMIT_SHA'
       - '--region=us-west1'
       - '--platform=managed'
       - '--min-instances=1'
@@ -25,14 +25,14 @@ steps:
       - '--memory=1Gi'
       - '--cpu=1'
       - '--timeout=300'
-      - '--set-env-vars=^|^DJANGO_SETTINGS_MODULE=config.settings.production|ALLOWED_HOSTS=.a.run.app,.bedrockintel.com|GCS_BUCKET_NAME=mergethreatwatch-reports'
+      - '--set-env-vars=^|^DJANGO_SETTINGS_MODULE=config.settings.production|ALLOWED_HOSTS=.a.run.app,.your-domain.com|GCS_BUCKET_NAME=threatwatch-reports'
       - '--set-secrets=SECRET_KEY=MTW_APP_SECRET_KEY:latest,MONGODB_URI=mtw-mongodb-URI:latest,REDIS_URL=redis-url:latest'
       - '--vpc-connector=mtw-app-access'
       - '--vpc-egress=all-traffic'
       - '--allow-unauthenticated'
 
 images:
-  - 'us-west1-docker.pkg.dev/$PROJECT_ID/mergethreatwatch/app:$COMMIT_SHA'
+  - 'us-west1-docker.pkg.dev/$PROJECT_ID/threatwatch/app:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY

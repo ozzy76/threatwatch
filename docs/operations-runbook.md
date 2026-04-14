@@ -1,8 +1,8 @@
-# MergeThreatWatch — Operations Runbook
+# ThreatWatch — Operations Runbook
 
-**Application:** MergeThreatWatch
+**Application:** ThreatWatch
 **Stack:** Django 6.0.3 · MongoEngine · Redis · Google Cloud Run · Cloud Build
-**Last updated:** 2026-03-11
+**Last updated:** 2026-03-31
 
 ---
 
@@ -19,6 +19,7 @@
 9. [Monitoring & Logs](#9-monitoring--logs)
 10. [Rollback Procedure](#10-rollback-procedure)
 11. [Routine Maintenance](#11-routine-maintenance)
+12. [Teardown & Resume](#12-teardown--resume)
 
 ---
 
@@ -71,8 +72,8 @@ Reference: [gcloud auth docs](https://cloud.google.com/sdk/gcloud/reference/auth
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_ORG/mergethreatwatch.git
-cd mergethreatwatch
+git clone https://github.com/YOUR_ORG/threatwatch.git
+cd threatwatch
 
 # 2. Create and activate Python virtualenv
 python3.14 -m venv 2026mtw
@@ -109,8 +110,8 @@ The `.env.example` file in the repo shows all required variables:
 ```ini
 DJANGO_SETTINGS_MODULE=config.settings.development
 SECRET_KEY=your-secret-key-here
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/mergethreatwatch?tls=true
-GCS_BUCKET_NAME=mergethreatwatch-reports
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/threatwatch?tls=true
+GCS_BUCKET_NAME=threatwatch-reports
 REDIS_URL=redis://127.0.0.1:6379/0
 ALLOWED_HOSTS=localhost,127.0.0.1
 ```
@@ -162,10 +163,10 @@ gcloud services enable \
 ### 5b. Create Artifact Registry repository
 
 ```bash
-gcloud artifacts repositories create mergethreatwatch \
+gcloud artifacts repositories create threatwatch \
   --repository-format=docker \
   --location=us-west1 \
-  --description="MergeThreatWatch container images"
+  --description="ThreatWatch container images"
 ```
 
 Reference: [Artifact Registry docs](https://cloud.google.com/artifact-registry/docs)
@@ -173,7 +174,7 @@ Reference: [Artifact Registry docs](https://cloud.google.com/artifact-registry/d
 ### 5c. Create GCS bucket for reports
 
 ```bash
-gcloud storage buckets create gs://mergethreatwatch-reports \
+gcloud storage buckets create gs://threatwatch-reports \
   --location=us-west1 \
   --uniform-bucket-level-access
 ```
@@ -221,7 +222,7 @@ python -c "from django.core.management.utils import get_random_secret_key; print
   gcloud secrets create MTW_APP_SECRET_KEY --data-file=-
 
 # MongoDB URI (replace with your Atlas connection string)
-echo -n "mongodb+srv://user:pass@cluster.mongodb.net/mergethreatwatch?tls=true" | \
+echo -n "mongodb+srv://user:pass@cluster.mongodb.net/threatwatch?tls=true" | \
   gcloud secrets create mtw-mongodb-URI --data-file=-
 
 # Redis URL (replace with your Redis instance URL)
@@ -237,13 +238,13 @@ Use this for one-off deploys outside of the automated CI/CD pipeline.
 
 ```bash
 # Build and push the Docker image manually
-IMAGE="us-west1-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/mergethreatwatch/app:manual-$(date +%Y%m%d%H%M%S)"
+IMAGE="us-west1-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/threatwatch/app:manual-$(date +%Y%m%d%H%M%S)"
 
 docker build -t "$IMAGE" .
 docker push "$IMAGE"
 
 # Deploy to Cloud Run
-gcloud run deploy mergethreatwatch \
+gcloud run deploy threatwatch \
   --image="$IMAGE" \
   --region=us-west1 \
   --platform=managed \
@@ -252,7 +253,7 @@ gcloud run deploy mergethreatwatch \
   --memory=1Gi \
   --cpu=1 \
   --timeout=300 \
-  --set-env-vars="DJANGO_SETTINGS_MODULE=config.settings.production,ALLOWED_HOSTS=.a.run.app,.bedrockintel.com,GCS_BUCKET_NAME=mergethreatwatch-reports" \
+  --set-env-vars="DJANGO_SETTINGS_MODULE=config.settings.production,ALLOWED_HOSTS=.a.run.app,.your-domain.com,GCS_BUCKET_NAME=threatwatch-reports" \
   --set-secrets="SECRET_KEY=MTW_APP_SECRET_KEY:latest,MONGODB_URI=mtw-mongodb-URI:latest,REDIS_URL=redis-url:latest" \
   --vpc-connector=mtw-app-access \
   --vpc-egress=all-traffic \
@@ -276,7 +277,7 @@ The `cloudbuild.yaml` at the repo root defines the automated pipeline:
 1. Open [Cloud Build triggers](https://console.cloud.google.com/cloud-build/triggers) in the GCP console.
 2. Click **Connect Repository**.
 3. Select **GitHub (Cloud Build GitHub App)** and follow the OAuth flow to authorize GCP.
-4. Select your GitHub organization and the `mergethreatwatch` repository.
+4. Select your GitHub organization and the `threatwatch` repository.
 5. Click **Connect**.
 
 Reference: [Cloud Build GitHub integration](https://cloud.google.com/build/docs/automating-builds/github/connect-repo-github)
@@ -286,10 +287,10 @@ Reference: [Cloud Build GitHub integration](https://cloud.google.com/build/docs/
 ```bash
 gcloud builds triggers create github \
   --repo-owner=YOUR_GITHUB_ORG \
-  --repo-name=mergethreatwatch \
+  --repo-name=threatwatch \
   --branch-pattern="^main$" \
   --build-config=cloudbuild.yaml \
-  --name=mergethreatwatch-deploy-on-push \
+  --name=threatwatch-deploy-on-push \
   --description="Deploy to Cloud Run on push to main"
 ```
 
@@ -297,9 +298,9 @@ Or via the console: **Cloud Build → Triggers → Create Trigger** and fill in:
 
 | Field | Value |
 |---|---|
-| Name | `mergethreatwatch-deploy-on-push` |
+| Name | `threatwatch-deploy-on-push` |
 | Event | Push to a branch |
-| Repository | `YOUR_ORG/mergethreatwatch` |
+| Repository | `YOUR_ORG/threatwatch` |
 | Branch | `^main$` |
 | Build configuration | Cloud Build configuration file (cloudbuild.yaml) |
 
@@ -317,7 +318,7 @@ GitHub notifies Cloud Build
 Cloud Build runs cloudbuild.yaml
   Step 1: docker build -t .../app:$COMMIT_SHA .
   Step 2: docker push .../app:$COMMIT_SHA
-  Step 3: gcloud run deploy mergethreatwatch --image=.../app:$COMMIT_SHA
+  Step 3: gcloud run deploy threatwatch --image=.../app:$COMMIT_SHA
        │
        ▼
 Cloud Run serves new revision
@@ -350,7 +351,7 @@ There is no public registration. All accounts are provisioned by an administrato
 # On a local dev machine
 python manage.py create_user \
   --username jsmith \
-  --email jsmith@bedrockintel.com \
+  --email jsmith@your-domain.com \
   --first-name Jane \
   --last-name Smith \
   --role analyst
@@ -358,7 +359,7 @@ python manage.py create_user \
 # Create an admin account
 python manage.py create_user \
   --username admin \
-  --email admin@bedrockintel.com \
+  --email admin@your-domain.com \
   --staff \
   --role admin
 ```
@@ -372,7 +373,7 @@ Use [Cloud Run jobs](https://cloud.google.com/run/docs/execute/jobs) or execute 
 Alternatively, connect to the container via Cloud Shell:
 ```bash
 gcloud run jobs execute --region=us-west1 --wait \
-  -- python manage.py create_user --username jsmith --email jsmith@bedrockintel.com
+  -- python manage.py create_user --username jsmith --email jsmith@your-domain.com
 ```
 
 ### Sync MITRE ATT&CK data
@@ -400,11 +401,11 @@ Reference: [MITRE ATT&CK](https://attack.mitre.org/) · [mitreattack-python docs
 
 ```bash
 # Stream live logs
-gcloud run services logs tail mergethreatwatch --region=us-west1
+gcloud run services logs tail threatwatch --region=us-west1
 
 # Query recent logs (last 1 hour)
 gcloud logging read \
-  'resource.type="cloud_run_revision" AND resource.labels.service_name="mergethreatwatch"' \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="threatwatch"' \
   --freshness=1h \
   --format="table(timestamp, severity, textPayload)"
 ```
@@ -413,18 +414,18 @@ Reference: [Cloud Run logging docs](https://cloud.google.com/run/docs/logging)
 
 ### View logs in GCP console
 
-Navigate to: **Cloud Run → mergethreatwatch → Logs tab**
+Navigate to: **Cloud Run → threatwatch → Logs tab**
 
 Or use [Cloud Logging](https://console.cloud.google.com/logs) with filter:
 ```
 resource.type="cloud_run_revision"
-resource.labels.service_name="mergethreatwatch"
+resource.labels.service_name="threatwatch"
 ```
 
 ### Check service status
 
 ```bash
-gcloud run services describe mergethreatwatch --region=us-west1
+gcloud run services describe threatwatch --region=us-west1
 ```
 
 ---
@@ -437,17 +438,17 @@ Cloud Run keeps all previous revisions. A rollback is a traffic shift — no red
 
 ```bash
 # List revisions (newest first)
-gcloud run revisions list --service=mergethreatwatch --region=us-west1
+gcloud run revisions list --service=threatwatch --region=us-west1
 
 # Route 100% of traffic to a specific previous revision
-gcloud run services update-traffic mergethreatwatch \
+gcloud run services update-traffic threatwatch \
   --region=us-west1 \
-  --to-revisions=mergethreatwatch-XXXXXXX=100
+  --to-revisions=threatwatch-XXXXXXX=100
 ```
 
 ### Via console
 
-1. Open **Cloud Run → mergethreatwatch → Revisions**
+1. Open **Cloud Run → threatwatch → Revisions**
 2. Select the target revision
 3. Click **Manage Traffic** and set it to 100%
 
@@ -499,8 +500,8 @@ When rotating a secret (e.g., `SECRET_KEY`):
 echo -n "new-secret-value" | gcloud secrets versions add MTW_APP_SECRET_KEY --data-file=-
 
 # 2. Redeploy Cloud Run so it picks up the :latest version
-gcloud run deploy mergethreatwatch \
-  --image=$(gcloud run services describe mergethreatwatch --region=us-west1 --format="value(spec.template.spec.containers[0].image)") \
+gcloud run deploy threatwatch \
+  --image=$(gcloud run services describe threatwatch --region=us-west1 --format="value(spec.template.spec.containers[0].image)") \
   --region=us-west1
 
 # 3. Disable the old version after confirming the service is healthy
@@ -523,10 +524,62 @@ Current Cloud Run settings (set in `cloudbuild.yaml`):
 
 To adjust:
 ```bash
-gcloud run services update mergethreatwatch \
+gcloud run services update threatwatch \
   --region=us-west1 \
   --memory=2Gi \
   --max-instances=20
+```
+
+---
+
+## 12. Teardown & Resume
+
+### Quick reference
+
+| Goal | Command |
+|------|---------|
+| Shut down all production GCP resources | `bash scripts/terminate-prod.sh` |
+| Rebuild all infrastructure and redeploy | `bash scripts/resume-prod.sh` |
+
+### What terminate-prod.sh deletes
+
+All billable GCP resources:
+- Global HTTPS Load Balancer (forwarding rule, proxy, cert, URL map, backend, NEG)
+- Cloud Armor security policy
+- Cloud Run service `threatwatch`
+- Artifact Registry repository `threatwatch` (all images)
+- VPC Access Connector `mtw-app-access`
+- Redis Memorystore instance `mtw-app-redis`
+- Cloud NAT `mtw-nat` and Cloud Router `mtw-router`
+- Static external IP
+- Secret Manager secret `redis-url`
+- IAM bindings for Cloud Build and Cloud Run service accounts
+
+**Not deleted:** `MTW_APP_SECRET_KEY`, `mtw-mongodb-URI` secrets (data retained), GCS bucket `threatwatch-reports` (run `gcloud storage rm -r gs://threatwatch-reports` manually if data is not needed).
+
+### Manual steps after terminate
+
+1. **Hover DNS:** Remove `A` record `mtw` → `<LB-IP>`
+2. **MongoDB Atlas:** Remove the Cloud NAT static IP (`<NAT-IP>/32`) from the IP Access List
+
+### What resume-prod.sh recreates
+
+All infrastructure in correct order, then deploys from source. The Redis AUTH string and internal IP change on recreation — the script fetches them and updates the `redis-url` secret automatically.
+
+### Manual steps after resume
+
+1. **MongoDB Atlas:** Add the new NAT IP (printed by the script) to the IP Access List **before** the script continues past the prompt
+2. **Hover DNS:** Update `A` record `mtw` → new LB IP (printed at end of script)
+3. **SSL cert:** Becomes `ACTIVE` within ~10 minutes of DNS propagation
+
+### Verification after teardown
+
+```bash
+gcloud run services list --region=us-west1                           # empty
+gcloud compute forwarding-rules list --global                        # empty
+gcloud redis instances list --region=us-west1                        # empty
+gcloud compute networks vpc-access connectors list --region=us-west1 # empty
+dig mtw.your-domain.com A                                           # NXDOMAIN after DNS TTL
 ```
 
 ---
@@ -547,11 +600,11 @@ python manage.py create_user --username X --email Y [--staff] [--role admin|anal
 python manage.py sync_mitre
 
 # Manual deploy
-gcloud run deploy mergethreatwatch --source . --region=us-west1
+gcloud run deploy threatwatch --source . --region=us-west1
 
 # View live logs
-gcloud run services logs tail mergethreatwatch --region=us-west1
+gcloud run services logs tail threatwatch --region=us-west1
 
 # Rollback to previous revision
-gcloud run services update-traffic mergethreatwatch --region=us-west1 --to-revisions=REVISION_ID=100
+gcloud run services update-traffic threatwatch --region=us-west1 --to-revisions=REVISION_ID=100
 ```

@@ -36,13 +36,13 @@ def _resolve_stix_path() -> Path:
     Resolution order:
     1. MITRE_STIX_PATH env var (explicit local file)
     2. GCS bucket (downloads and caches locally)
-    3. Local cache dir ~/.cache/mergethreatwatch/
+    3. Local cache dir ~/.cache/threatwatch/
     """
     env_path = os.environ.get("MITRE_STIX_PATH")
     if env_path:
         return Path(env_path)
 
-    cache_dir = Path(tempfile.gettempdir()) / "mergethreatwatch"
+    cache_dir = Path(tempfile.gettempdir()) / "threatwatch"
     cache_dir.mkdir(parents=True, exist_ok=True)
     local_path = cache_dir / _STIX_FILENAME
 
