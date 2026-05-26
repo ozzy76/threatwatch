@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Scope Risk Scenario{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'fair:dashboard' %}">Quantified Risk</a></li>
+      <li class="breadcrumb-item active text-secondary" aria-current="page">Scope Risk Scenario</li>
+    </ol>
+  </nav>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="risk-card">
+        <h1 class="h3 mb-2 fw-bold">&#128308; Scope Risk Scenario</h1>
+        <p class="text-secondary small mb-4">Establish the boundaries of the quantitative scenario: identify the asset at risk, optional third-party mapping, threat agent, effect, and regulatory factors.</p>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Step 1: Scenario Identification -->
+          <fieldset class="mb-4">
+            <legend class="h5 fw-bold mb-3 border-bottom pb-2">1. Scenario Definition</legend>
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">A clear, descriptive name identifying the potential security incident.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Describe scope boundaries, assumptions, and key business impacts.</div>
+            </div>
+          </fieldset>
+
+          <!-- Step 2: The Core Elements (Asset, Threat Agent, Threat Effect) -->
+          <fieldset class="mb-4">
+            <legend class="h5 fw-bold mb-3 border-bottom pb-2">2. Scoping Parameters</legend>
+            
+            <div class="mb-3">
+              <label for="{{ form.asset.id_for_label }}" class="form-label">{{ form.asset.label }}</label>
+              {{ form.asset }}
+              {% if form.asset.errors %}
+                <div class="invalid-feedback d-block">{{ form.asset.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Specify the system, portal, repository, or database at risk.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.third_party_id.id_for_label }}" class="form-label">{{ form.third_party_id.label }}</label>
+              {{ form.third_party_id }}
+              {% if form.third_party_id.errors %}
+                <div class="invalid-feedback d-block">{{ form.third_party_id.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Link this scenario to an external supplier/vendor (optional). Leave empty for internal risks.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.threat_agent_id.id_for_label }}" class="form-label">{{ form.threat_agent_id.label }}</label>
+              {{ form.threat_agent_id }}
+              {% if form.threat_agent_id.errors %}
+                <div class="invalid-feedback d-block">{{ form.threat_agent_id.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Select an active MITRE ATT&amp;CK Threat Community tracked in your threat intelligence module.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.threat_agent_text.id_for_label }}" class="form-label">{{ form.threat_agent_text.label }}</label>
+              {{ form.threat_agent_text }}
+              {% if form.threat_agent_text.errors %}
+                <div class="invalid-feedback d-block">{{ form.threat_agent_text.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Fallback input if the specific threat group is not listed above.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.threat_effect.id_for_label }}" class="form-label">{{ form.threat_effect.label }}</label>
+              {{ form.threat_effect }}
+              {% if form.threat_effect.errors %}
+                <div class="invalid-feedback d-block">{{ form.threat_effect.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text text-muted">Choose the primary threat effect (CIA impact type).</div>
+            </div>
+          </fieldset>
+
+          <!-- Step 3: Financial Risk Authority Modifiers -->
+          <fieldset class="mb-4">
+            <legend class="h5 fw-bold mb-3 border-bottom pb-2">3. Insurance &amp; Regulatory Parameters</legend>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.insurance_premium.id_for_label }}" class="form-label">{{ form.insurance_premium.label }}</label>
+                {{ form.insurance_premium }}
+                {% if form.insurance_premium.errors %}
+                  <div class="invalid-feedback d-block">{{ form.insurance_premium.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text text-muted">The annual policy premium. Used to assess return-on-investment for safeguards.</div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.regulatory_penalty_multiplier.id_for_label }}" class="form-label">{{ form.regulatory_penalty_multiplier.label }}</label>
+                {{ form.regulatory_penalty_multiplier }}
+                {% if form.regulatory_penalty_multiplier.errors %}
+                  <div class="invalid-feedback d-block">{{ form.regulatory_penalty_multiplier.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text text-muted">Adjusts secondary loss magnitudes for strict regulatory environments. (Default is 1.0)</div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'fair:dashboard' %}" class="btn btn-outline-dark">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              Save &amp; Continue to Calibration
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

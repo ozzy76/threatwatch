@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
 
-class CustomerForm(forms.Form):
+class ThirdPartyForm(forms.Form):
     name               = forms.CharField(max_length=200)
     industry_sector    = forms.CharField(max_length=100, required=False, label="Industry Sector")
     industry_subsector = forms.CharField(max_length=100, required=False, label="Subsector")
@@ -93,3 +93,26 @@ class CustomerForm(forms.Form):
                 "Only http:// and https:// URLs are accepted."
             )
         return value
+
+
+class ThirdPartyCSVUploadForm(forms.Form):
+    csv_file = forms.FileField(
+        label="CSV File",
+        help_text="Upload a .csv file containing Name and Website URL columns.",
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": ".csv"})
+    )
+
+    def clean_csv_file(self):
+        uploaded_file = self.cleaned_data.get("csv_file")
+        if not uploaded_file:
+            raise ValidationError("No file was uploaded.")
+
+        # Limit file size to 2 MB to prevent DoS attacks
+        if uploaded_file.size > 2 * 1024 * 1024:
+            raise ValidationError("File size exceeds the 2MB limit.")
+
+        # Validate file extension
+        if not uploaded_file.name.endswith('.csv'):
+            raise ValidationError("Invalid file type. Only CSV files are allowed.")
+
+        return uploaded_file

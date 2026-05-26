@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Quantified Risk Command Center{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
+      <li class="breadcrumb-item active text-secondary" aria-current="page">Quantified Risk Command Center</li>
+    </ol>
+  </nav>
+
+  <!-- Title block -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <h1 class="h2 risk-title">&#128309; Quantified Risk Command Center</h1>
+      <p class="risk-subtitle">Model, calculate, and report cyber risk in financial dollar terms{% if filtered_third_party %} for {{ filtered_third_party.name }}{% else %} across your enterprise{% endif %}.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <a href="{% url 'fair:scoping_wizard' %}" class="btn btn-risk-primary">
+        &#10010; New Scoping Scenario
+      </a>
+    </div>
+  </div>
+
+  <!-- Exposure summary and alerts -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="risk-card h-100">
+        <div class="risk-label">Total Simulated Cyber Risk Exposure</div>
+        <div class="risk-metric-val risk-metric-cyan mb-2">
+          ${{ total_avg_ale|floatformat:2|intcomma }}
+        </div>
+        <p class="text-muted small mb-0">
+          Aggregated Annualized Loss Exposure (ALE) across all active quantitative threat scenarios.
+        </p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="risk-card h-100">
+        <div class="risk-label">Threat Action Alerts</div>
+        <div class="risk-metric-val {% if alert_count > 0 %}risk-metric-orange{% else %}risk-metric-green{% endif %} mb-2">
+          {{ alert_count }} Active Alert{% if alert_count != 1 %}s{% endif %}
+        </div>
+        <p class="text-muted small mb-0">
+          {% if alert_count > 0 %}
+            Recalculation recommended: Active campaigns targeting linked third-party sectors have been detected in the wild or scenario parameters have updated.
+          {% else %}
+            No new threat campaigns targeting your linked sectors have been recorded since your last analysis runs.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Active Risk Scenarios List -->
+    <div class="col-xl-8">
+      <div class="risk-card h-100">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="h5 mb-0 fw-bold">Quantitative Threat Scenarios</h2>
+          <span class="risk-badge risk-badge-active">{{ scenarios|length }} Active</span>
+        </div>
+
+        {% if scenarios %}
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless align-middle" aria-label="Quantitative threat scenarios list">
+              <thead>
+                <tr class="border-bottom text-muted small">
+                  <th scope="col" class="pb-2">Scenario &amp; Asset</th>
+                  <th scope="col" class="pb-2">Linked Third Party</th>
+                  <th scope="col" class="pb-2">Threat Agent &amp; Effect</th>
+                  <th scope="col" class="pb-2 text-end">Simulated Annual Loss (Avg)</th>
+                  <th scope="col" class="pb-2 text-center">Status</th>
+                  <th scope="col" class="pb-2 text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in scenarios %}
+                  <tr class="border-bottom">
+                    <td class="py-3">
+                      <div class="fw-bold">{{ item.scenario.name }}</div>
+                      <div class="text-muted small">Asset: {{ item.scenario.asset }}</div>
+                    </td>
+                    <td class="py-3">
+                      {% if item.scenario.third_party %}
+                        <a href="{% url 'customers:customer_detail' item.scenario.third_party.id %}" class="text-decoration-none fw-bold text-dark">
+                          {{ item.scenario.third_party.name }}
+                        </a>
+                      {% else %}
+                        <span class="text-muted small">Internal Enterprise Risk</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3">
+                      <div class="fw-semibold">
+                        {% if item.scenario.threat_agent %}
+                          {{ item.scenario.threat_agent.name }}
+                        {% else %}
+                          {{ item.scenario.threat_agent_text|default:"Generic Threat Community" }}
+                        {% endif %}
+                      </div>
+                      <div class="text-secondary small">{{ item.scenario.get_threat_effect_display }}</div>
+                    </td>
+                    <td class="py-3 text-end font-monospace fw-bold">
+                      {% if item.latest_run %}
+                        ${{ item.latest_run.avg_ale|floatformat:0|intcomma }}
+                      {% else %}
+                        <span class="text-muted small">Not simulated</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 text-center">
+                      {% if item.needs_recalc %}
+                        <span class="badge badge-medium" title="{{ item.recalc_reason }}">Needs Recalc</span>
+                      {% elif item.latest_run %}
+                        <span class="badge badge-low">Simulated</span>
+                      {% else %}
+                        <span class="badge badge-info">Pending Calibration</span>
+                      {% endif %}
+                    </td>
+                    <td class="py-3 text-end">
+                      <div class="btn-group">
+                        {% if item.latest_run %}
+                          <a href="{% url 'fair:analysis_detail' item.latest_run.id %}" class="btn btn-sm btn-outline-dark me-1">
+                            View Report
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'fair:calibrate_scenario' item.scenario.id %}" class="btn btn-sm btn-outline-dark">
+                          {% if item.latest_run %}Calibrate{% else %}Enter Estimates{% endif %}
+                        </a>
+                        {% if item.needs_recalc and item.latest_run %}
+                          <form method="post" action="{% url 'fair:auto_recalculate' item.scenario.id %}" class="d-inline ms-1">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-primary px-2" title="Recalculate with updated inputs">
+                              &#8635; Recalc
+                            </button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="display-4 text-muted mb-3">&#128301;</div>
+            <h3 class="h5 text-muted">No Risk Scenarios Defined</h3>
+            <p class="text-muted small">Establish your first quantitative risk scenario to model threat communities and potential losses.</p>
+            <a href="{% url 'fair:scoping_wizard' %}" class="btn btn-primary mt-3">
+              Create Scenario
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: Threat Intelligence Campaigns & Sector info -->
+    <div class="col-xl-4">
+      <div class="risk-card">
+        <h3 class="h5 mb-3 fw-bold">Threat Intelligence Context</h3>
+        
+        {% if filtered_third_party %}
+          <div class="risk-label mb-2">Third Party Profile</div>
+          <p class="small mb-3 border-bottom pb-3">
+            <strong>{{ filtered_third_party.name }}</strong>
+            {% if filtered_third_party.industry.sector %}<br><span class="text-muted">Sector:</span> {{ filtered_third_party.industry.sector }}{% endif %}
+            {% if filtered_third_party.industry.subsector %}<br><span class="text-muted">Subsector:</span> {{ filtered_third_party.industry.subsector }}{% endif %}
+          </p>
+        {% endif %}
+
+        <h4 class="small risk-label mb-3">Active Campaigns in the Wild</h4>
+        {% if recent_campaigns %}
+          <ul class="list-group list-group-flush bg-transparent">
+            {% for campaign in recent_campaigns %}
+              <li class="list-group-item bg-transparent px-0 py-3">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5 class="h6 mb-1 fw-bold text-dark">{{ campaign.name }}</h5>
+                  <small class="text-muted">{{ campaign.created_at|date:"Y-m-d" }}</small>
+                </div>
+                <p class="mb-1 text-secondary small">{{ campaign.description|truncatechars:120 }}</p>
+                <small class="badge {% if campaign.severity == 'critical' or campaign.severity == 'high' %}badge-critical{% else %}badge-medium{% endif %}">Severity: {{ campaign.severity|title }}</small>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted small py-3">No recent threat campaigns recorded.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+{% endblock %}

@@ -18,7 +18,7 @@ def generate_pdf(context: dict) -> bytes:
         base_url = settings.BASE_DIR
         pdf_bytes = HTML(string=html_string, base_url=str(base_url)).write_pdf()
         logger.info(
-            "Generated PDF for customer %s: %d bytes",
+            "Generated PDF for third party %s: %d bytes",
             context.get("customer"),
             len(pdf_bytes),
         )
@@ -35,7 +35,7 @@ def build_report_context(customer, user) -> dict:
     from apps.detections.models import Detection
     from bson import ObjectId
 
-    breaches = list(Breach.objects(customer=customer).order_by("-breach_date"))
+    breaches = list(Breach.objects(third_party=customer).order_by("-breach_date"))
 
     actors = []
     technique_ids = set()
@@ -58,5 +58,4 @@ def build_report_context(customer, user) -> dict:
         "breaches": breaches,
         "actors": actors,
         "detections": detections,
-        "technique_ids": sorted(technique_ids),
     }

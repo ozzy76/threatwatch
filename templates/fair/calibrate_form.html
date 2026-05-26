@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Calibrate Estimates — {{ scenario.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
+      {% if scenario.third_party %}
+        <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' scenario.third_party.id %}">{{ scenario.third_party.name }}</a></li>
+      {% endif %}
+      <li class="breadcrumb-item"><a href="{% url 'fair:dashboard' %}">Quantified Risk</a></li>
+      <li class="breadcrumb-item active text-secondary" aria-current="page">Calibrate Scenario</li>
+    </ol>
+  </nav>
+
+  <!-- Scenario Summary Box -->
+  <div class="risk-card mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-9">
+        <span class="risk-badge risk-badge-active mb-2 d-inline-block">Active Scope</span>
+        <h1 class="h4 fw-bold mb-1">{{ scenario.name }}</h1>
+        <p class="text-secondary small mb-0">
+          <strong>Asset at Risk:</strong> {{ scenario.asset }} | 
+          <strong>Threat Agent:</strong> 
+          {% if scenario.threat_agent %}
+            {{ scenario.threat_agent.name }}
+          {% else %}
+            {{ scenario.threat_agent_text|default:"Generic Threat Community" }}
+          {% endif %} |
+          <strong>Primary Impact (Effect):</strong> {{ scenario.get_threat_effect_display }}
+        </p>
+      </div>
+      <div class="col-md-3 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'fair:scoping_wizard' %}" class="btn btn-sm btn-outline-dark">
+          Edit Scope
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+      <div class="risk-card">
+        <h2 class="h4 mb-2 fw-bold">&#127899; Range Calibration &amp; Rationales</h2>
+        <p class="text-secondary small mb-4">Input calibrated minimum, most likely, and maximum parameters. Providing high-fidelity rationales based on objective security metrics ensures analysis integrity.</p>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Section 1: Threat Event Frequency (TEF) -->
+          <div class="p-4 mb-4 rounded border">
+            <h3 class="h5 fw-bold mb-2 border-bottom pb-2">1. Threat Event Frequency (TEF)</h3>
+            <p class="text-muted small mb-3">How many times per year does the threat agent attempt a threat event against the asset?</p>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.tef_min.id_for_label }}" class="form-label">{{ form.tef_min.label }}</label>
+                {{ form.tef_min }}
+                {% if form.tef_min.errors %}
+                  <div class="invalid-feedback d-block">{{ form.tef_min.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.tef_mode.id_for_label }}" class="form-label">{{ form.tef_mode.label }}</label>
+                {{ form.tef_mode }}
+                {% if form.tef_mode.errors %}
+                  <div class="invalid-feedback d-block">{{ form.tef_mode.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.tef_max.id_for_label }}" class="form-label">{{ form.tef_max.label }}</label>
+                {{ form.tef_max }}
+                {% if form.tef_max.errors %}
+                  <div class="invalid-feedback d-block">{{ form.tef_max.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              <label for="{{ form.tef_rationale.id_for_label }}" class="form-label">{{ form.tef_rationale.label }}</label>
+              {{ form.tef_rationale }}
+              {% if form.tef_rationale.errors %}
+                <div class="invalid-feedback d-block">{{ form.tef_rationale.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Section 2: Vulnerability (Vuln) -->
+          <div class="p-4 mb-4 rounded border">
+            <h3 class="h5 fw-bold mb-2 border-bottom pb-2">2. Vulnerability (Vuln)</h3>
+            <p class="text-muted small mb-3">What is the probability (0.0 to 1.0) that a threat event results in a successful breach / compromise?</p>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.vuln_min.id_for_label }}" class="form-label">{{ form.vuln_min.label }}</label>
+                {{ form.vuln_min }}
+                {% if form.vuln_min.errors %}
+                  <div class="invalid-feedback d-block">{{ form.vuln_min.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.vuln_mode.id_for_label }}" class="form-label">{{ form.vuln_mode.label }}</label>
+                {{ form.vuln_mode }}
+                {% if form.vuln_mode.errors %}
+                  <div class="invalid-feedback d-block">{{ form.vuln_mode.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.vuln_max.id_for_label }}" class="form-label">{{ form.vuln_max.label }}</label>
+                {{ form.vuln_max }}
+                {% if form.vuln_max.errors %}
+                  <div class="invalid-feedback d-block">{{ form.vuln_max.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              <label for="{{ form.vuln_rationale.id_for_label }}" class="form-label">{{ form.vuln_rationale.label }}</label>
+              {{ form.vuln_rationale }}
+              {% if form.vuln_rationale.errors %}
+                <div class="invalid-feedback d-block">{{ form.vuln_rationale.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Section 3: Primary Loss Magnitude (PLM) -->
+          <div class="p-4 mb-4 rounded border">
+            <h3 class="h5 fw-bold mb-2 border-bottom pb-2">3. Primary Loss Magnitude ($)</h3>
+            <p class="text-muted small mb-3">What are the immediate, direct financial impacts of a single successful breach event (e.g. incident response, forensic investigations)?</p>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.primary_loss_min.id_for_label }}" class="form-label">{{ form.primary_loss_min.label }}</label>
+                {{ form.primary_loss_min }}
+                {% if form.primary_loss_min.errors %}
+                  <div class="invalid-feedback d-block">{{ form.primary_loss_min.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.primary_loss_mode.id_for_label }}" class="form-label">{{ form.primary_loss_mode.label }}</label>
+                {{ form.primary_loss_mode }}
+                {% if form.primary_loss_mode.errors %}
+                  <div class="invalid-feedback d-block">{{ form.primary_loss_mode.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.primary_loss_max.id_for_label }}" class="form-label">{{ form.primary_loss_max.label }}</label>
+                {{ form.primary_loss_max }}
+                {% if form.primary_loss_max.errors %}
+                  <div class="invalid-feedback d-block">{{ form.primary_loss_max.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              <label for="{{ form.primary_loss_rationale.id_for_label }}" class="form-label">{{ form.primary_loss_rationale.label }}</label>
+              {{ form.primary_loss_rationale }}
+              {% if form.primary_loss_rationale.errors %}
+                <div class="invalid-feedback d-block">{{ form.primary_loss_rationale.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Section 4: Secondary Loss Event Frequency (SLEF) -->
+          <div class="p-4 mb-4 rounded border">
+            <h3 class="h5 fw-bold mb-2 border-bottom pb-2">4. Secondary Loss Event Frequency (SLEF)</h3>
+            <p class="text-muted small mb-3">What is the probability (0.0 to 1.0) that a breach triggers secondary, follow-on losses (like third-party notification, lawsuits, or regulatory penalties)?</p>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_freq_min.id_for_label }}" class="form-label">{{ form.secondary_loss_freq_min.label }}</label>
+                {{ form.secondary_loss_freq_min }}
+                {% if form.secondary_loss_freq_min.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_freq_min.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_freq_mode.id_for_label }}" class="form-label">{{ form.secondary_loss_freq_mode.label }}</label>
+                {{ form.secondary_loss_freq_mode }}
+                {% if form.secondary_loss_freq_mode.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_freq_mode.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_freq_max.id_for_label }}" class="form-label">{{ form.secondary_loss_freq_max.label }}</label>
+                {{ form.secondary_loss_freq_max }}
+                {% if form.secondary_loss_freq_max.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_freq_max.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              <label for="{{ form.secondary_loss_freq_rationale.id_for_label }}" class="form-label">{{ form.secondary_loss_freq_rationale.label }}</label>
+              {{ form.secondary_loss_freq_rationale }}
+              {% if form.secondary_loss_freq_rationale.errors %}
+                <div class="invalid-feedback d-block">{{ form.secondary_loss_freq_rationale.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Section 5: Secondary Loss Magnitude (SLM) -->
+          <div class="p-4 mb-4 rounded border">
+            <h3 class="h5 fw-bold mb-2 border-bottom pb-2">5. Secondary Loss Magnitude ($)</h3>
+            <p class="text-muted small mb-3">What are the potential financial values of those secondary, follow-on losses? (Will be automatically scaled by regulatory factors)</p>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_mag_min.id_for_label }}" class="form-label">{{ form.secondary_loss_mag_min.label }}</label>
+                {{ form.secondary_loss_mag_min }}
+                {% if form.secondary_loss_mag_min.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_mag_min.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_mag_mode.id_for_label }}" class="form-label">{{ form.secondary_loss_mag_mode.label }}</label>
+                {{ form.secondary_loss_mag_mode }}
+                {% if form.secondary_loss_mag_mode.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_mag_mode.errors.0 }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.secondary_loss_mag_max.id_for_label }}" class="form-label">{{ form.secondary_loss_mag_max.label }}</label>
+                {{ form.secondary_loss_mag_max }}
+                {% if form.secondary_loss_mag_max.errors %}
+                  <div class="invalid-feedback d-block">{{ form.secondary_loss_mag_max.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              <label for="{{ form.secondary_loss_mag_rationale.id_for_label }}" class="form-label">{{ form.secondary_loss_mag_rationale.label }}</label>
+              {{ form.secondary_loss_mag_rationale }}
+              {% if form.secondary_loss_mag_rationale.errors %}
+                <div class="invalid-feedback d-block">{{ form.secondary_loss_mag_rationale.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+            <a href="{% url 'fair:dashboard' %}" class="btn btn-outline-dark">
+              &larr; Return to Dashboard
+            </a>
+            <button type="submit" class="btn btn-primary">
+              &#128187; Run 10,000 Monte Carlo Simulations
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

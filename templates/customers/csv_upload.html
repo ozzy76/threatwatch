@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Bulk Upload Third Parties — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm border-0 mt-4" style="border-radius: 12px; background-color: #ffffff;">
+      <div class="card-header bg-dark text-white p-4" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+        <h1 class="h5 mb-0 fw-bold">Bulk Ingest Third Parties</h1>
+        <p class="text-white-50 small mb-0">Upload a CSV file to add multiple clients to your organization.</p>
+      </div>
+      <div class="card-body p-4">
+        
+        <div class="alert alert-info py-3 mb-4 small" style="border-radius: 8px;">
+          <h6 class="fw-bold mb-1">CSV Template Instructions:</h6>
+          <p class="mb-2">Your CSV file must include the following headers exactly as spelled:</p>
+          <code class="d-block bg-white p-2 rounded mb-2 font-monospace border">Name,Website URL</code>
+          <p class="mb-0">Example:<br><span class="font-monospace text-secondary">Acme Corp,https://acme.org</span></p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          {% if organizations %}
+          <div class="mb-4">
+            <label for="organization_id" class="form-label fw-semibold text-secondary">Target Organization (Admin-only)</label>
+            <select name="organization_id" id="organization_id" class="form-select">
+              <option value="">-- No Organization (Global Float) --</option>
+              {% for org in organizations %}
+              <option value="{{ org.id }}">{{ org.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+          <div class="mb-4">
+            <label for="{{ form.csv_file.id_for_label }}" class="form-label fw-semibold text-secondary">CSV File</label>
+            {{ form.csv_file }}
+            {% if form.csv_file.errors %}
+            <div class="text-danger small mt-1">{{ form.csv_file.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-2">
+            <a href="{% url 'customers:customer_list' %}" class="btn btn-outline-dark px-4" style="border-radius: 6px;">Cancel</a>
+            <button type="submit" class="btn btn-dark px-4" style="border-radius: 6px; background-color: #000000; border-color: #000000;">Upload and Process</button>
+          </div>
+        </form>
+
+        {% if success_count %}
+        <div class="alert alert-success mt-4 py-2 small" style="border-radius: 8px;">
+          <strong>Success!</strong> Imported {{ success_count }} record(s) successfully.
+        </div>
+        {% endif %}
+
+        {% if errors %}
+        <div class="mt-4 pt-3 border-top">
+          <h6 class="text-danger fw-bold mb-2">Incomplete or Failed Rows ({{ fail_count }}):</h6>
+          <div class="overflow-auto bg-light p-3 border rounded small" style="max-height: 200px;">
+            <ul class="list-unstyled mb-0 font-monospace text-danger">
+              {% for err in errors %}
+              <li class="mb-1">• {{ err }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+        
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

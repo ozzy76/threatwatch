@@ -2,7 +2,7 @@ from mongoengine import Document, fields
 
 
 class Report(Document):
-    customer = fields.ReferenceField("customers.Customer", required=True)
+    third_party = fields.ReferenceField("customers.ThirdParty", required=True)
     generated_by = fields.ReferenceField("accounts.User", required=True)
     generated_at = fields.DateTimeField(required=True)
     gcs_object_path = fields.StringField(required=True)
@@ -14,9 +14,9 @@ class Report(Document):
 
     meta = {
         "collection": "reports_report",
-        "indexes": ["customer", "generated_by", "generated_at"],
+        "indexes": ["third_party", "generated_by", "generated_at"],
         "ordering": ["-generated_at"],
     }
 
     def __str__(self):
-        return f"Report for {self.customer} at {self.generated_at:%Y-%m-%d %H:%M}"
+        return f"Report for {self.third_party} at {self.generated_at:%Y-%m-%d %H:%M}"

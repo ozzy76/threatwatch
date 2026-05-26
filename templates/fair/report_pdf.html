@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: letter;
+        margin: 1in;
+        @top-center {
+          content: "ThreatWatch — Quantified Risk Executive Report";
+          font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 8pt;
+          color: #888888;
+          border-bottom: 1px solid #e5e5e5;
+          padding-bottom: 5px;
+          width: 100%;
+        }
+        @bottom-left {
+          content: "Confidential — {{ customer.name }}";
+          font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 8pt;
+          color: #888888;
+        }
+        @bottom-right {
+          content: "Page " counter(page) " of " counter(pages);
+          font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 8pt;
+          color: #888888;
+        }
+      }
+      body {
+        background-color: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+    }
+
+    @media screen {
+      html {
+        background-color: #f4f0e9; /* Warm Premium Linen */
+      }
+      body {
+        max-width: 850px;
+        margin: 40px auto !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        padding: 60px !important;
+        border-radius: 12px;
+        border: 1px solid #e1e1e1;
+      }
+    }
+
+    body {
+      font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #15171a;
+      line-height: 1.5;
+      font-size: 10pt;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #0b0f19;
+      font-weight: 700;
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 24pt;
+      border-bottom: 2px solid #00e5ff;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 16pt;
+      color: #008fa8;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 5px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 12pt;
+      color: #0b0f19;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+
+    .meta-box {
+      background-color: #f8fafc;
+      border-left: 4px solid #00e5ff;
+      padding: 15px;
+      margin-bottom: 30px;
+    }
+
+    .meta-grid {
+      display: table;
+      width: 100%;
+    }
+
+    .meta-row {
+      display: table-row;
+    }
+
+    .meta-label {
+      display: table-cell;
+      font-weight: bold;
+      width: 25%;
+      padding: 5px 0;
+      color: #4a5568;
+    }
+
+    .meta-value {
+      display: table-cell;
+      width: 75%;
+      padding: 5px 0;
+    }
+
+    .metric-grid {
+      display: table;
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: separate;
+      border-spacing: 15px 0;
+    }
+
+    .metric-card {
+      display: table-cell;
+      background-color: #0b0f19;
+      color: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      width: 33.33%;
+    }
+
+    .metric-card .label {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9ca3af;
+      margin-bottom: 5px;
+    }
+
+    .metric-card .value {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #00e5ff;
+    }
+
+    .metric-card .value.highlight {
+      color: #00e676;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .table th, .table td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: bold;
+    }
+
+    .table tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .chart-container {
+      text-align: center;
+      margin: 30px 0;
+      page-break-inside: avoid;
+    }
+
+    .svg-chart {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .footer-note {
+      font-size: 8pt;
+      color: #64748b;
+      margin-top: 50px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 8pt;
+      font-weight: bold;
+      border-radius: 4px;
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .badge-cyan {
+      background-color: #e0fcfd;
+      color: #008fa8;
+    }
+  </style>
+</head>
+<body>
+  <!-- Print Control Header for fallback screen preview -->
+  <div class="no-print" style="margin: -60px -60px 40px -60px; background-color: #000000; color: #ffffff; padding: 15px 40px; border-top-left-radius: 12px; border-top-right-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-family: 'Poppins', sans-serif;">
+    <div style="font-weight: 700; font-size: 15px; letter-spacing: -0.01em;">ThreatWatch Executive Report Preview</div>
+    <div style="display: flex; gap: 12px;">
+      <button onclick="window.print()" style="background-color: #ffffff; color: #000000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 13px; font-family: 'Poppins', sans-serif;">
+        Print / Save to PDF
+      </button>
+      <a href="{% url 'fair:analysis_detail' run.id %}" style="background-color: transparent; color: #ffffff; border: 1.5px solid #ffffff; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 13px; font-family: 'Poppins', sans-serif;">
+        Return to App
+      </a>
+    </div>
+  </div>
+
+  {% if auto_print %}
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    }
+  </script>
+  {% endif %}
+
+  <h1>Quantified Risk Analysis Report</h1>
+
+  <div class="meta-box">
+    <div class="meta-grid">
+      <div class="meta-row">
+        <div class="meta-label">Third Party:</div>
+        <div class="meta-value">{{ customer.name }}</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Scenario Name:</div>
+        <div class="meta-value"><strong>{{ scenario.name }}</strong></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Target Asset:</div>
+        <div class="meta-value">{{ scenario.asset }}</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Threat Community:</div>
+        <div class="meta-value">
+          {% if scenario.threat_agent %}
+            {{ scenario.threat_agent.name }}
+          {% else %}
+            {{ scenario.threat_agent_text|default:"Generic Threat Community" }}
+          {% endif %}
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Threat Effect:</div>
+        <div class="meta-value"><span class="badge badge-cyan">{{ scenario.get_threat_effect_display }}</span></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Analysis Date:</div>
+        <div class="meta-value">{{ run.created_at|date:"Y-m-d H:i" }} UTC</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Executive Summary</h2>
+  <p>
+    This report presents a quantitative, financial simulation of the cyber risk scenario described above.
+    Using Monte Carlo mathematical modeling (10,000 iterations), we simulated potential annual losses by evaluating
+    <strong>Threat Event Frequency</strong>, <strong>Vulnerability</strong>, and potential <strong>Primary and Secondary Loss</strong> magnitudes.
+    All assessments are calibrated inputs supported by expert rationales.
+  </p>
+
+  <div class="metric-grid">
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="label">Minimum Annual Loss</div>
+        <div class="value">${{ run.min_ale|floatformat:2 }}</div>
+      </div>
+      <div class="metric-card" style="background-color: #008fa8;">
+        <div class="label" style="color: #e0fcfd;">Average Annual Loss</div>
+        <div class="value" style="color: #ffffff;">${{ run.avg_ale|floatformat:2 }}</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Maximum Annual Loss</div>
+        <div class="value" style="color: #ff1744;">${{ run.max_ale|floatformat:2 }}</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="table" aria-label="Risk metrics summary">
+    <thead>
+      <tr>
+        <th scope="col">Risk Exposure Metric</th>
+        <th scope="col" class="text-right">Value ($)</th>
+        <th scope="col">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Minimum Simulated Loss (Min ALE)</strong></td>
+        <td class="text-right">${{ run.min_ale|floatformat:2 }}</td>
+        <td>The absolute lowest loss exposure simulated in 10,000 runs.</td>
+      </tr>
+      <tr>
+        <td><strong>Average Simulated Loss (Avg ALE)</strong></td>
+        <td class="text-right" style="font-weight: bold; color: #008fa8;">${{ run.avg_ale|floatformat:2 }}</td>
+        <td>The average annualized risk exposure (expected loss per year).</td>
+      </tr>
+      <tr>
+        <td><strong>Median Simulated Loss</strong></td>
+        <td class="text-right">${{ run.median_ale|floatformat:2 }}</td>
+        <td>The 50th percentile of loss distributions (equal probability of being above or below).</td>
+      </tr>
+      <tr>
+        <td><strong>Value at Risk (95% VaR)</strong></td>
+        <td class="text-right" style="color: #ff1744; font-weight: bold;">${{ run.var_95|floatformat:2 }}</td>
+        <td>95% of the simulated outcomes fall below this loss figure. There is a 5% chance of exceeding this limit.</td>
+      </tr>
+      <tr>
+        <td><strong>Maximum Simulated Loss (Max ALE)</strong></td>
+        <td class="text-right">${{ run.max_ale|floatformat:2 }}</td>
+        <td>The absolute maximum loss recorded in the worst-case simulation scenarios.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h2>Loss Exceedance Curve (LEC)</h2>
+  <p>
+    The Loss Exceedance Curve represents the probability (Y-axis) that the annualized financial loss from this scenario
+    will exceed a given dollar threshold (X-axis).
+  </p>
+
+  <div class="chart-container">
+    {% if svg_points %}
+      <svg class="svg-chart" width="700" height="380" viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid lines and ticks -->
+        <line x1="80" y1="20" x2="80" y2="350" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="80" y1="350" x2="760" y2="350" stroke="#cbd5e1" stroke-width="2"/>
+
+        <!-- Y Axis Ticks & Grid (0% to 100%) -->
+        {% for pct in "0,20,40,60,80,100"|slice:":" %}
+          <line x1="80" y1="{{ 350|add:"-330"|add:pct }}" x2="760" y2="{{ 350|add:"-330"|add:pct }}" stroke="#f1f5f9" stroke-width="1"/>
+          <!-- Since WeasyPrint/Django templates can be tricky with inline math, we can output static tick marks. -->
+        {% endfor %}
+
+        <!-- Explicit grid & tick lines -->
+        <line x1="80" y1="350" x2="760" y2="350" stroke="#cbd5e1" stroke-width="1"/>
+        <text x="50" y="354" font-size="9" fill="#64748b" font-family="sans-serif">0%</text>
+        
+        <line x1="80" y1="284" x2="760" y2="284" stroke="#e2e8f0" stroke-dasharray="3,3"/>
+        <text x="50" y="288" font-size="9" fill="#64748b" font-family="sans-serif">20%</text>
+        
+        <line x1="80" y1="218" x2="760" y2="218" stroke="#e2e8f0" stroke-dasharray="3,3"/>
+        <text x="50" y="222" font-size="9" fill="#64748b" font-family="sans-serif">40%</text>
+        
+        <line x1="80" y1="152" x2="760" y2="152" stroke="#e2e8f0" stroke-dasharray="3,3"/>
+        <text x="50" y="156" font-size="9" fill="#64748b" font-family="sans-serif">60%</text>
+        
+        <line x1="80" y1="86" x2="760" y2="86" stroke="#e2e8f0" stroke-dasharray="3,3"/>
+        <text x="50" y="90" font-size="9" fill="#64748b" font-family="sans-serif">80%</text>
+        
+        <line x1="80" y1="20" x2="760" y2="20" stroke="#cbd5e1" stroke-dasharray="3,3"/>
+        <text x="44" y="24" font-size="9" fill="#64748b" font-family="sans-serif">100%</text>
+
+        <!-- X Axis Labels -->
+        {% for pt in svg_points %}
+          <text x="{{ pt.x }}" y="368" font-size="8" fill="#64748b" font-family="sans-serif" text-anchor="middle">
+            ${{ pt.threshold|floatformat:0 }}
+          </text>
+        {% endfor %}
+
+        <!-- Curve Line -->
+        <polyline fill="none" stroke="#008fa8" stroke-width="3" points="{% for pt in svg_points %}{{ pt.x }},{{ pt.y }} {% endfor %}"/>
+
+        <!-- Points -->
+        {% for pt in svg_points %}
+          <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="5" fill="#00e5ff" stroke="#008fa8" stroke-width="2"/>
+          <text x="{{ pt.x }}" y="{{ pt.y|add:"-10" }}" font-size="8" fill="#0f172a" font-weight="bold" font-family="sans-serif" text-anchor="middle">
+            {{ pt.probability|floatformat:1 }}%
+          </text>
+        {% endfor %}
+      </svg>
+    {% else %}
+      <p class="text-muted">No Exceedance Curve Data available.</p>
+    {% endif %}
+  </div>
+
+  <h2>Evidence &amp; Calibration Rationales</h2>
+  <table class="table" aria-label="Evidence and calibration rationales">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 30%;">Estimation Factor</th>
+        <th scope="col" style="width: 25%;">Calibrated Range (Min, Mode, Max)</th>
+        <th scope="col" style="width: 45%;">Rationale / Evidence Record</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Threat Event Frequency (TEF)</strong></td>
+        <td>{{ run.tef_min }} - {{ run.tef_mode }} - {{ run.tef_max }} / yr</td>
+        <td>{{ run.rationale.tef }}</td>
+      </tr>
+      <tr>
+        <td><strong>Vulnerability (Vuln)</strong></td>
+        <td>{{ run.vuln_min }} - {{ run.vuln_mode }} - {{ run.vuln_max }}</td>
+        <td>{{ run.rationale.vuln }}</td>
+      </tr>
+      <tr>
+        <td><strong>Primary Loss Magnitude</strong></td>
+        <td>${{ run.primary_loss_min|floatformat:2 }} - ${{ run.primary_loss_mode|floatformat:2 }} - ${{ run.primary_loss_max|floatformat:2 }}</td>
+        <td>{{ run.rationale.primary_loss }}</td>
+      </tr>
+      <tr>
+        <td><strong>Secondary Loss Frequency</strong></td>
+        <td>{{ run.secondary_loss_freq_min }} - {{ run.secondary_loss_freq_mode }} - {{ run.secondary_loss_freq_max }}</td>
+        <td>{{ run.rationale.secondary_loss_freq }}</td>
+      </tr>
+      <tr>
+        <td><strong>Secondary Loss Magnitude</strong></td>
+        <td>${{ run.secondary_loss_mag_min|floatformat:2 }} - ${{ run.secondary_loss_mag_mode|floatformat:2 }} - ${{ run.secondary_loss_mag_max|floatformat:2 }}</td>
+        <td>{{ run.rationale.secondary_loss_mag }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Projected Safeguards &amp; Risk Reduction</h2>
+  <p>
+    The following controls have been simulated to show their potential risk reduction impact.
+    The primary metric for ROI is <strong>Annualized Loss Exposure (ALE) Savings</strong>.
+  </p>
+
+  <table class="table" aria-label="Safeguard recommendations and projected savings">
+    <thead>
+      <tr>
+        <th scope="col">Control / Safeguard Recommendation</th>
+        <th scope="col">Projected Impact Details</th>
+        <th scope="col" class="text-right">Estimated Cost ($)</th>
+        <th scope="col" class="text-right">Projected ALE ($)</th>
+        <th scope="col" class="text-right">Projected Savings ($)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for safeguard in run.safeguard_recommendations %}
+        <tr>
+          <td>
+            <strong>{{ safeguard.name }}</strong><br/>
+            <small style="color: #64748b;">{{ safeguard.description }}</small>
+          </td>
+          <td><span class="badge badge-cyan">{{ safeguard.reduction }}</span></td>
+          <td class="text-right">${{ safeguard.cost|floatformat:2 }}</td>
+          <td class="text-right">${{ safeguard.after_avg|floatformat:2 }}</td>
+          <td class="text-right" style="color: #16a34a; font-weight: bold;">${{ safeguard.savings|floatformat:2 }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer-note">
+    Report generated on {{ generated_at|date:"Y-m-d H:i:s" }} UTC. Prepared by {{ generated_by.username }}. Powered by ThreatWatch Quantified Risk Intelligence.
+  </div>
+
+</body>
+</html>

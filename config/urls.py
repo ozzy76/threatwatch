@@ -6,4 +6,6 @@ urlpatterns = [
     path("threats/", include("apps.threats.urls")),
     path("detections/", include("apps.detections.urls")),
     path("reports/", include("apps.reports.urls")),
+    path("", include("apps.fair.urls")),
 ]
+

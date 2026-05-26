@@ -8,4 +8,7 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("users/", views.user_list, name="user_list"),
     path("users/new/", views.user_create, name="user_create"),
+    path("oidc/login/<str:provider>/", views.oidc_login, name="oidc_login"),
+    path("oidc/callback/", views.oidc_callback, name="oidc_callback"),
+    path("profile/", views.profile_view, name="profile"),
 ]

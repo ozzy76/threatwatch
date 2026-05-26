@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}SSO Sandbox — ThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-lg text-white" style="background: linear-gradient(145deg, #0f1626 0%, #080b11 100%); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05) !important;">
+      <div class="card-header text-center py-4" style="border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent;">
+        <div class="d-inline-block px-3 py-1 mb-2 rounded-pill font-monospace text-uppercase" style="font-size: 0.65rem; background: rgba(0, 229, 255, 0.1); color: #00e5ff; letter-spacing: 1px; border: 1px solid rgba(0, 229, 255, 0.2);">
+          Identity Sandbox
+        </div>
+        <h1 class="h4 mb-0 fw-semibold tracking-wide" style="font-family: 'Poppins', sans-serif;">
+          Authorize {{ provider_name }} SSO
+        </h1>
+      </div>
+      <div class="card-body p-4">
+        <p class="small text-center mb-4" style="color: #cbd5e1; line-height: 1.6; font-size: 0.9rem;">
+          You are simulating a Single Sign-On flow. Entering an email below will automatically log you in, and if the email is not registered, it will auto-provision your ThreatWatch account.
+        </p>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="id_email" class="form-label small fw-bold text-uppercase" style="color: #a0aec0; letter-spacing: 0.5px;">Email Address</label>
+            <input type="email" name="email" id="id_email" class="form-control bg-dark border-secondary text-white py-2" placeholder="e.g. analyst@company.com" required style="border-radius: 8px;">
+            <div class="invalid-feedback">Please enter a valid email.</div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-6">
+              <label for="id_first" class="form-label small fw-bold text-uppercase" style="color: #a0aec0; letter-spacing: 0.5px;">First Name</label>
+              <input type="text" name="first_name" id="id_first" class="form-control bg-dark border-secondary text-white py-2" placeholder="Jane" style="border-radius: 8px;">
+            </div>
+            <div class="col-6">
+              <label for="id_last" class="form-label small fw-bold text-uppercase" style="color: #a0aec0; letter-spacing: 0.5px;">Last Name</label>
+              <input type="text" name="last_name" id="id_last" class="form-control bg-dark border-secondary text-white py-2" placeholder="Smith" style="border-radius: 8px;">
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-info text-dark fw-semibold py-2" style="background-color: #00e5ff; border: none; border-radius: 8px; transition: all 0.3s ease;">
+              Complete SSO Authentication
+            </button>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary py-2 text-white border-secondary" style="border-radius: 8px;">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

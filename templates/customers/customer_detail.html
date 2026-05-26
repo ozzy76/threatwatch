@@ -5,7 +5,7 @@
 {% block content %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">Customers</a></li>
+    <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ customer.name }}</li>
   </ol>
 </nav>
@@ -50,15 +50,13 @@
     {% endif %}
   </div>
   <div class="col-lg-4 d-flex flex-column gap-2 align-items-start">
-    {% if request.user.role == "admin" %}
-    <a href="{% url 'customers:customer_edit' customer.id %}" class="btn btn-outline-primary">
-      Edit Customer
+    {% if request.user.role == "admin" or request.user.role == "analyst" %}
+    <a href="{% url 'customers:customer_edit' customer.id %}" class="btn btn-outline-dark">
+      Edit Third Party
     </a>
-    <form method="post" action="{% url 'customers:customer_delete' customer.id %}"
-          onsubmit="return confirm('Soft-delete this customer?');">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-danger">Delete Customer</button>
-    </form>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+      Delete Third Party
+    </button>
     {% endif %}
     {% if customer.has_known_breach %}
     <span class="badge bg-danger">Known Data Breach</span>
@@ -154,4 +152,43 @@
   </div>
 </section>
 {% endif %}
+
+<!-- Modal Component (Placed at the bottom of the template body) -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow" style="border-radius: 12px; background-color: #ffffff;">
+      
+      <!-- Premium Design Header -->
+      <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between">
+        <div class="d-flex align-items-center">
+          <div class="bg-danger-soft rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: #fce8e6;">
+            <span style="font-size: 1.35rem; color: #dc3545;">&#9888;</span>
+          </div>
+          <h5 class="modal-title fw-bold text-dark" id="deleteConfirmModalLabel">Delete Third Party</h5>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Descriptive Body -->
+      <div class="modal-body px-4 py-3">
+        <p class="text-muted mb-0">
+          Are you sure you want to delete <strong class="text-dark">{{ customer.name }}</strong>? This will perform a soft-delete (deactivate), removing the entity from active feeds. All associated risk dashboards and breach history records will remain securely preserved in your data lake.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-footer border-0 pt-2 pb-4 px-4 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 6px; font-weight: 500;">Cancel</button>
+        
+        <form method="post" action="{% url 'customers:customer_delete' customer.id %}" class="d-inline m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger px-4" style="border-radius: 6px; font-weight: 500; background-color: #dc3545; border-color: #dc3545;">
+            Confirm Deletion
+          </button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,34 +1,331 @@
-/* ThreatWatch custom styles */
+/* ==========================================================================
+   Bedrock Intel Corporate Theme & Styling for ThreatWatch
+   Conformed to bedrockintel.com brand guidelines
+   ========================================================================== */
 
+/* Load Poppins Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* Brand Design Tokens */
+:root {
+  --bi-bg: #f4f0e9;                      /* Warm Premium Linen */
+  --bi-card-bg: #ffffff;                 /* Pure White Cards */
+  --bi-text-primary: #15171a;            /* Deep Charcoal */
+  --bi-text-secondary: #738a94;          /* Soft Muted Grey */
+  --bi-border-color: #e1e1e1;            /* Modern Light Grey Border */
+  --bi-accent-black: #000000;            /* Bold Signature Accent */
+  
+  /* Brand Status Colors */
+  --bi-accent-green: #a4d037;            /* Warm Brand Green */
+  --bi-accent-yellow: #fecd35;           /* Warm Brand Yellow */
+  --bi-accent-red: #f05230;              /* Warm Brand Red */
+  --bi-wash: #e5eff5;                    /* Soft Blue Selection Wash */
+  --bi-select: #daf2fd;                  /* Highlight Blue Wash */
+  
+  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Re-map Risk Theme Variables to light-brand context */
+  --risk-bg: var(--bi-bg);
+  --risk-card-bg: var(--bi-card-bg);
+  --risk-border-color: var(--bi-border-color);
+  --risk-accent-cyan: var(--bi-accent-black);
+  --risk-accent-green: var(--bi-accent-green);
+  --risk-accent-orange: var(--bi-accent-yellow);
+  --risk-accent-red: var(--bi-accent-red);
+  --risk-text-primary: var(--bi-text-primary);
+  --risk-text-secondary: var(--bi-text-secondary);
+  --risk-grid-line: rgba(21, 23, 26, 0.025);
+  --risk-glow-cyan: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --risk-glow-green: 0 2px 8px rgba(164, 208, 55, 0.15);
+}
+
+/* Global Reset & Base Layout */
 body {
+  background-color: var(--bi-bg) !important;
+  color: var(--bi-text-primary) !important;
+  font-family: var(--font-sans) !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 main {
   flex: 1;
 }
 
-/* Severity badge colours */
-.badge-critical { background-color: #dc3545; }
-.badge-high { background-color: #fd7e14; }
-.badge-medium { background-color: #ffc107; color: #212529; }
-.badge-low { background-color: #198754; }
-.badge-info { background-color: #0dcaf0; color: #212529; }
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  color: var(--bi-accent-black);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 
-/* Threat actor card */
-.actor-card { border-left: 4px solid #dc3545; }
+/* Skip link */
+.visually-hidden-focusable:focus {
+  background-color: var(--bi-accent-black);
+  color: #fff;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+/* Accessibility Focus Outline */
+:focus-visible {
+  outline: 3px solid var(--bi-accent-black);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Navigation & Navbar Overhaul
+   ========================================================================== */
+.navbar-brand {
+  font-weight: 800 !important;
+  letter-spacing: -0.03em;
+  color: var(--bi-accent-black) !important;
+  font-size: 1.5rem;
+}
+
+.navbar {
+  border-bottom: 1px solid var(--bi-border-color);
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.nav-link {
+  color: var(--bi-text-primary) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px;
+  transition: all 0.25s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--bi-wash);
+  color: var(--bi-accent-black) !important;
+}
+
+.nav-link.active {
+  background-color: var(--bi-select);
+  color: var(--bi-accent-black) !important;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Premium Forms & Form Controls
+   ========================================================================== */
+.form-control, .form-select {
+  border: 1px solid var(--bi-border-color) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  font-family: var(--font-sans) !important;
+  color: var(--bi-text-primary) !important;
+  background-color: #ffffff !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--bi-accent-black) !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bi-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Sliders */
+input[type="range"] {
+  accent-color: var(--bi-accent-black);
+}
+
+/* ==========================================================================
+   Buttons (The Signature Bedrock Pill)
+   ========================================================================== */
+.btn-primary, .btn-risk-primary {
+  background-color: var(--bi-accent-black) !important;
+  border: 1px solid var(--bi-accent-black) !important;
+  color: #ffffff !important;
+  border-radius: 48px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: -0.01em;
+  transition: all 0.25s cubic-bezier(0.04, 0.04, 0.12, 0.96) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.btn-primary:hover, .btn-risk-primary:hover {
+  background-color: #222222 !important;
+  border-color: #222222 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
+}
+
+.btn-outline-primary, .btn-risk-secondary {
+  background-color: transparent !important;
+  border: 1.5px solid var(--bi-accent-black) !important;
+  color: var(--bi-accent-black) !important;
+  border-radius: 48px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-outline-primary:hover, .btn-risk-secondary:hover {
+  background-color: var(--bi-accent-black) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Small buttons */
+.btn-sm {
+  padding: 0.4rem 1.2rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* ==========================================================================
+   Cards, Tables, and General Containers
+   ========================================================================== */
+.card, .risk-card {
+  background: var(--bi-card-bg) !important;
+  border: 1px solid var(--bi-border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02) !important;
+  padding: 1.5rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease !important;
+  color: var(--bi-text-primary) !important;
+}
+
+.card:hover, .risk-card:hover {
+  transform: translateY(-3px);
+  border-color: #cbcbcb !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+}
+
+.card-header {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--bi-border-color) !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Bootstrap Table Theme Adjustments */
+.table {
+  color: var(--bi-text-primary) !important;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--bi-text-secondary);
+  border-bottom: 1px solid var(--bi-border-color) !important;
+  background-color: transparent !important;
+}
+
+.table td {
+  border-bottom: 1px solid var(--bi-border-color) !important;
+  padding: 1rem 0.75rem !important;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   Severity & Status Badges
+   ========================================================================== */
+.badge {
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.badge-critical { background-color: var(--bi-accent-red) !important; color: #ffffff !important; }
+.badge-high { background-color: var(--bi-accent-red) !important; color: #ffffff !important; opacity: 0.85; }
+.badge-medium { background-color: var(--bi-accent-yellow) !important; color: var(--bi-accent-black) !important; }
+.badge-low { background-color: var(--bi-accent-green) !important; color: var(--bi-accent-black) !important; }
+.badge-info { background-color: var(--bi-select) !important; color: var(--bi-accent-black) !important; }
+
+/* Threat actor card border accent */
+.actor-card {
+  border-left: 4px solid var(--bi-accent-red) !important;
+}
 
 /* Detection priority bar */
 .priority-bar {
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #198754 0%, #ffc107 50%, #dc3545 100%);
+  background: linear-gradient(90deg, var(--bi-accent-green) 0%, var(--bi-accent-yellow) 50%, var(--bi-accent-red) 100%) !important;
 }
 
-/* Focus-visible outline for accessibility */
-:focus-visible {
-  outline: 3px solid #0d6efd;
-  outline-offset: 2px;
+/* Footer Styling */
+footer {
+  background-color: var(--bi-accent-black) !important;
+  border-top: 1px solid var(--bi-border-color);
+  padding: 2.5rem 0 !important;
+  color: var(--bi-text-secondary) !important;
+}
+
+footer small {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Quantified Risk Module Styling Elements
+   ========================================================================== */
+body.risk-body {
+  background-color: var(--bi-bg) !important;
+  color: var(--bi-text-primary) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.risk-metric-val {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.risk-metric-cyan { color: var(--bi-accent-black) !important; text-shadow: none !important; }
+.risk-metric-green { color: var(--bi-accent-green) !important; text-shadow: none !important; }
+.risk-metric-orange { color: var(--bi-accent-yellow) !important; }
+.risk-metric-red { color: var(--bi-accent-red) !important; }
+
+.risk-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bi-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.risk-badge {
+  background-color: #ffffff;
+  border: 1px solid var(--bi-border-color);
+  color: var(--bi-text-primary);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.risk-badge-active {
+  background-color: var(--bi-select);
+  border: 1px solid var(--bi-accent-black);
+  color: var(--bi-accent-black);
+  font-weight: 600;
 }

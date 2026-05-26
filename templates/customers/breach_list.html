@@ -4,7 +4,7 @@
 {% block content %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">Customers</a></li>
+    <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
     <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer.name }}</a></li>
     <li class="breadcrumb-item active" aria-current="page">Breach Events</li>
   </ol>
@@ -61,7 +61,7 @@
 </div>
 {% else %}
 <div class="alert alert-success" role="alert">
-  No detailed breach events recorded for this customer.
+  No detailed breach events recorded for this third party.
 </div>
 {% endif %}
 {% endblock %}

@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from apps.accounts.decorators import login_required
-from apps.customers.views import _get_allowed_customer
+from apps.customers.views import _get_allowed_third_party
 from apps.threats.models import ThreatActor
 from .models import Detection
 
 
 @login_required
-def customer_detections(request, customer_id):
-    customer = _get_allowed_customer(request.user, customer_id)
+def third_party_detections(request, third_party_id):
+    customer = _get_allowed_third_party(request.user, third_party_id)
 
-    # Collect technique IDs from all threat actors associated with this customer
+    # Collect technique IDs from all threat actors associated with this third party
     technique_ids = set()
     actors = []
     for actor_oid in customer.associated_threat_actor_ids:

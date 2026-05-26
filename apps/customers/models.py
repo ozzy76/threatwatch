@@ -7,7 +7,7 @@ class IndustryInfo(EmbeddedDocument):
     naics_code = fields.IntField(null=True)
 
 
-class Customer(Document):
+class ThirdParty(Document):
     name = fields.StringField(max_length=200, required=True)
     short_name = fields.StringField(max_length=50, required=True)
     industry = fields.EmbeddedDocumentField(IndustryInfo)
@@ -36,7 +36,7 @@ class Customer(Document):
 
 
 class Breach(Document):
-    customer = fields.ReferenceField(Customer, required=True)
+    third_party = fields.ReferenceField(ThirdParty, required=True)
     breach_date = fields.DateTimeField(required=True)
     discovered_date = fields.DateTimeField(null=True)
     description = fields.StringField()
@@ -52,9 +52,9 @@ class Breach(Document):
 
     meta = {
         "collection": "customers_breach",
-        "indexes": ["customer", "breach_date", "severity"],
+        "indexes": ["third_party", "breach_date", "severity"],
         "ordering": ["-breach_date"],
     }
 
     def __str__(self):
-        return f"Breach @ {self.customer} on {self.breach_date:%Y-%m-%d}"
+        return f"Breach @ {self.third_party} on {self.breach_date:%Y-%m-%d}"

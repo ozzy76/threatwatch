@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}User Profile — MergeThreatWatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm border-0 mt-4" style="border-radius: 12px; background-color: #ffffff;">
+      <div class="card-header bg-dark text-white p-4" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+        <div class="d-flex align-items-center">
+          <span style="font-size: 1.8rem;" class="me-3">&#128100;</span>
+          <div>
+            <h1 class="h4 mb-0 fw-bold">My Profile</h1>
+            <p class="text-white-50 small mb-0">Manage your identity and organization credentials</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        
+        <!-- Info Badges -->
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+          <div class="me-auto">
+            <h5 class="mb-0 fw-bold text-dark">{{ profile_user.username }}</h5>
+            <span class="text-muted small">Username</span>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-dark text-uppercase px-3 py-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">{{ profile_user.role }}</span>
+            {% if profile_user.organization %}
+            <div class="mt-2">
+              <span class="badge bg-secondary px-3 py-2" style="font-size: 0.75rem; background-color: #6c757d !important;">
+                🏢 {{ profile_user.organization.name }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <form method="post" action="{% url 'accounts:profile' %}" novalidate>
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold text-secondary">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+              <div class="text-danger small mt-1" id="first-name-error">{{ form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold text-secondary">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+              <div class="text-danger small mt-1" id="last-name-error">{{ form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold text-secondary">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div class="text-danger small mt-1" id="email-error">{{ form.email.errors.0 }}</div>
+            {% endif %}
+            <div id="emailHelp" class="form-text text-muted">Primary contact for notifications and security logging.</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="{{ form.company_name.id_for_label }}" class="form-label fw-semibold text-secondary">Company Name</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}
+            <div class="text-danger small mt-1" id="company-name-error">{{ form.company_name.errors.0 }}</div>
+            {% endif %}
+            <div id="companyHelp" class="form-text text-muted">The name of the company or agency you represent.</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-2">
+            <a href="/" class="btn btn-outline-dark px-4" style="border-radius: 6px; font-weight: 500;">Back</a>
+            <button type="submit" class="btn btn-dark px-4" style="border-radius: 6px; font-weight: 500; background-color: #000000; border-color: #000000;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

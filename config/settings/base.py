@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "apps.threats",
     "apps.detections",
     "apps.reports",
+    "apps.fair",
 ]
 
 MIDDLEWARE = [
@@ -64,11 +65,32 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {}
 
 # --- MongoDB via MongoEngine ---
+import sys
 import certifi
 import mongoengine
 
 MONGODB_URI = config("MONGODB_URI")
-mongoengine.connect(host=MONGODB_URI, alias="default", tlsCAFile=certifi.where())
+
+if "test" in sys.argv:
+    # Use mongomock for unit tests
+    import mongomock
+    mongoengine.connect("test_db", host="localhost", mongo_client_class=mongomock.MongoClient, alias="default")
+else:
+    try:
+        # Connect to remote Atlas MongoDB, but with a timeout so it doesn't hang forever offline
+        mongoengine.connect(
+            host=MONGODB_URI,
+            alias="default",
+            tlsCAFile=certifi.where(),
+            serverSelectionTimeoutMS=2000,
+            connectTimeoutMS=2000
+        )
+    except Exception as e:
+        print(f"Warning: Remote MongoDB connection failed ({e}). Falling back to in-memory mongomock.")
+        import mongomock
+        mongoengine.connect("fallback_db", host="localhost", mongo_client_class=mongomock.MongoClient, alias="default")
+
+
 
 # --- Custom auth backend ---
 AUTHENTICATION_BACKENDS = ["apps.accounts.backends.MongoEngineBackend"]
@@ -126,14 +148,46 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ["'self'"],
-        "script-src": ["'self'"],
-        "style-src": ["'self'"],
-        "font-src": ["'self'"],
-        "img-src": ["'self'", "data:"],
+        "script-src": ["'self'", "'unsafe-inline'"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.bunny.net"],
+        "font-src": ["'self'", "https://fonts.bunny.net"],
+        "img-src": ["'self'", "data:", "https://*"],
         "object-src": ["'none'"],
         "base-uri": ["'self'"],
-        "form-action": ["'self'"],
+        "form-action": ["'self'", "https://accounts.google.com", "https://login.microsoftonline.com", "https://*.okta.com"],
         "frame-ancestors": ["'none'"],
+    }
+}
+
+# --- OIDC SSO Configuration ---
+OIDC_SANDBOX_MODE = config("OIDC_SANDBOX_MODE", default="True", cast=bool)
+OIDC_PROVIDERS = {
+    "google": {
+        "name": "Google",
+        "client_id": config("OIDC_GOOGLE_CLIENT_ID", default="mock-google-client-id"),
+        "client_secret": config("OIDC_GOOGLE_CLIENT_SECRET", default="mock-google-client-secret"),
+        "auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
+        "token_url": "https://oauth2.googleapis.com/token",
+        "userinfo_url": "https://openidconnect.googleapis.com/v1/userinfo",
+        "scope": "openid email profile",
+    },
+    "entra": {
+        "name": "Microsoft Entra ID",
+        "client_id": config("OIDC_ENTRA_CLIENT_ID", default="mock-entra-client-id"),
+        "client_secret": config("OIDC_ENTRA_CLIENT_SECRET", default="mock-entra-client-secret"),
+        "auth_url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+        "token_url": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+        "userinfo_url": "https://graph.microsoft.com/oidc/userinfo",
+        "scope": "openid email profile",
+    },
+    "okta": {
+        "name": "Okta",
+        "client_id": config("OIDC_OKTA_CLIENT_ID", default="mock-okta-client-id"),
+        "client_secret": config("OIDC_OKTA_CLIENT_SECRET", default="mock-okta-client-secret"),
+        "auth_url": "https://login.okta.com/oauth2/v1/authorize",
+        "token_url": "https://login.okta.com/oauth2/v1/token",
+        "userinfo_url": "https://login.okta.com/oauth2/v1/userinfo",
+        "scope": "openid email profile",
     }
 }
 

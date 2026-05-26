@@ -73,3 +73,44 @@ class UserCreateForm(forms.Form):
             except DjangoValidationError as exc:
                 self.add_error("password", exc)
         return cleaned
+
+
+class UserProfileForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="First Name",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Last Name",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    email = forms.EmailField(
+        required=True,
+        label="Email Address",
+        widget=forms.EmailInput(attrs={"class": "form-control"}),
+    )
+    company_name = forms.CharField(
+        max_length=200,
+        required=False,
+        label="Company Name",
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter your company name"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        # Verify email uniqueness excluding current user
+        query = User.objects(email=email)
+        if self.user:
+            query = query.filter(id__ne=self.user.id)
+        if query.first():
+            raise forms.ValidationError("A user with that email address already exists.")
+        return email
+

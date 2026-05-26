@@ -4,11 +4,12 @@
 {% block content %}
 <div class="row justify-content-center mt-5">
   <div class="col-md-5 col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white text-center py-3">
-        <h1 class="h4 mb-0">&#128274; ThreatWatch</h1>
+    <div class="card shadow">
+      <div class="text-center pt-4 pb-2 border-bottom-0">
+        <img src="https://storage.ghost.io/c/8c/55/8c55a855-7ffe-4149-add0-f2bfc3c60a00/content/images/2026/02/bedrock-logo.png" alt="Bedrock Intelligence Logo" class="mb-2" style="max-height: 45px;">
+        <h1 class="h5 fw-bold text-muted text-uppercase tracking-wider" style="font-size: 0.8rem; letter-spacing: 0.1em;">ThreatWatch Portal</h1>
       </div>
-      <div class="card-body p-4">
+      <div class="card-body p-4 pt-2">
         {% if lockout %}
         <div class="alert alert-danger" role="alert">
           Too many failed login attempts. Please try again in 15 minutes.
@@ -35,6 +36,35 @@
             <button type="submit" class="btn btn-primary">Sign In</button>
           </div>
         </form>
+
+        <div class="text-center my-4 position-relative">
+          <hr class="text-secondary">
+          <span class="px-2 position-absolute top-50 start-50 translate-middle text-muted bg-white small text-uppercase fw-semibold" style="font-size: 0.7rem; letter-spacing: 1px;">
+            Single Sign-On
+          </span>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="{% url 'accounts:oidc_login' provider='google' %}" class="btn btn-outline-danger d-flex align-items-center justify-content-center py-2" style="border-radius: 8px; font-weight: 500;">
+            <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0c2.158 0 3.972.79 5.374 2.083l-2.286 2.286C10.038 3.39 8.82 3 8 3c-2.763 0-5 2.237-5 5 0 2.763 2.237 5 5 5 1.956 0 3.436-1.119 3.864-2.842H8.213V6.558h7.332z"/>
+            </svg>
+            Continue with Google
+          </a>
+          <a href="{% url 'accounts:oidc_login' provider='entra' %}" class="btn btn-outline-primary d-flex align-items-center justify-content-center py-2" style="border-radius: 8px; font-weight: 500;">
+            <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M0 0h7.588v7.588H0V0zm8.412 0H16v7.588H8.412V0zM0 8.412h7.588V16H0V8.412zm8.412 0H16V16H8.412V8.412z"/>
+            </svg>
+            Continue with Entra ID
+          </a>
+          <a href="{% url 'accounts:oidc_login' provider='okta' %}" class="btn btn-outline-info d-flex align-items-center justify-content-center py-2" style="border-radius: 8px; font-weight: 500;">
+            <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+              <path d="M11.354 5.646a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+            </svg>
+            Continue with Okta
+          </a>
+        </div>
         {% endif %}
       </div>
     </div>
@@ -43,4 +73,5 @@
     </p>
   </div>
 </div>
+
 {% endblock %}

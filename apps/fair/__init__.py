@@ -1,0 +1,1 @@
+# apps.fair initialization

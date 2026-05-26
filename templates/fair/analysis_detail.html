@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Quantified Risk Analysis Detail — {{ scenario.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Third Parties</a></li>
+      {% if customer %}
+        <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer.name }}</a></li>
+      {% endif %}
+      <li class="breadcrumb-item"><a href="{% url 'fair:dashboard' %}">Quantified Risk</a></li>
+      <li class="breadcrumb-item active text-secondary" aria-current="page">Analysis Run Details</li>
+    </ol>
+  </nav>
+
+  <!-- Title bar -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-7">
+      <span class="risk-badge risk-badge-active mb-2 d-inline-block">Simulation #{{ run.id|truncatechars:10 }}</span>
+      <h1 class="h2 risk-title">&#128704; Quantitative Risk Analysis Report</h1>
+      <p class="risk-subtitle text-muted">Run executed by {{ run.run_by.username }} on {{ run.created_at|date:"Y-m-d H:i" }} UTC</p>
+    </div>
+    <div class="col-md-5 text-md-end">
+      <div class="btn-group">
+        <a href="{% url 'fair:analysis_pdf' run.id %}" class="btn btn-risk-primary">
+          &#128190; Export Executive PDF
+        </a>
+        <a href="{% url 'fair:calibrate_scenario' scenario.id %}" class="btn btn-risk-secondary ms-2">
+          &#128799; Adjust Calibration
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics row -->
+  <div class="row g-4 mb-4">
+    <!-- Avg ALE (Exposure) -->
+    <div class="col-md-4">
+      <div class="risk-card border-info text-center">
+        <div class="risk-label">Annualized Loss Exposure (Avg)</div>
+        <div class="risk-metric-val risk-metric-cyan my-2">
+          ${{ run.avg_ale|floatformat:2|intcomma }}
+        </div>
+        <div class="small">
+          {% if trend_direction == "decreased" %}
+            <span class="text-success">&darr; Decreased by {{ trend_pct }}% (-${{ trend_diff_val|floatformat:0|intcomma }})</span>
+          {% elif trend_direction == "increased" %}
+            <span class="text-danger">&uarr; Increased by {{ trend_pct }}% (+${{ trend_diff_val|floatformat:0|intcomma }})</span>
+          {% else %}
+            <span class="text-muted">Stable compared to last run</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 95% VaR (Value at Risk) -->
+    <div class="col-md-4">
+      <div class="risk-card border-danger text-center">
+        <div class="risk-label">95% Value at Risk (VaR)</div>
+        <div class="risk-metric-val risk-metric-red my-2">
+          ${{ run.var_95|floatformat:2|intcomma }}
+        </div>
+        <div class="text-muted small">
+          95% probability that losses will not exceed this value.
+        </div>
+      </div>
+    </div>
+
+    <!-- Loss Range -->
+    <div class="col-md-4">
+      <div class="risk-card border-secondary text-center">
+        <div class="risk-label">Simulated Loss Range</div>
+        <div class="risk-metric-val text-dark my-2" style="font-size: 1.6rem; font-weight: 700; padding: 0.45rem 0;">
+          ${{ run.min_ale|floatformat:0|intcomma }} &mdash; ${{ run.max_ale|floatformat:0|intcomma }}
+        </div>
+        <div class="text-muted small">
+          Absolute simulated Min to Max loss bounds.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Chart Column: Loss Exceedance Curve -->
+    <div class="col-lg-7">
+      <div class="risk-card h-100">
+        <h3 class="h5 mb-3">&#128200; Loss Exceedance Curve (LEC)</h3>
+        <p class="text-muted small mb-4">
+          Shows the simulated probability (Y-axis) of experiencing annual loss exceeding any given dollar amount (X-axis).
+        </p>
+
+        <!-- Native SVG Chart -->
+        <div class="p-2 border border-light rounded bg-light">
+          <svg viewBox="0 0 800 400" class="w-100" aria-label="Loss Exceedance Curve chart" style="max-height: 380px;">
+            <!-- Grid Lines & Background -->
+            <rect width="800" height="400" fill="transparent" />
+            
+            <!-- Horizontal probability grid lines (0%, 25%, 50%, 75%, 100%) -->
+            <line x1="80" y1="20" x2="760" y2="20" stroke="rgba(21, 23, 26, 0.08)" stroke-dasharray="4" />
+            <text x="70" y="25" fill="#738a94" font-size="11" text-anchor="end">100%</text>
+
+            <line x1="80" y1="102.5" x2="760" y2="102.5" stroke="rgba(21, 23, 26, 0.08)" stroke-dasharray="4" />
+            <text x="70" y="107.5" fill="#738a94" font-size="11" text-anchor="end">75%</text>
+
+            <line x1="80" y1="185" x2="760" y2="185" stroke="rgba(21, 23, 26, 0.08)" stroke-dasharray="4" />
+            <text x="70" y="190" fill="#738a94" font-size="11" text-anchor="end">50%</text>
+
+            <line x1="80" y1="267.5" x2="760" y2="267.5" stroke="rgba(21, 23, 26, 0.08)" stroke-dasharray="4" />
+            <text x="70" y="272.5" fill="#738a94" font-size="11" text-anchor="end">25%</text>
+
+            <line x1="80" y1="350" x2="760" y2="350" stroke="rgba(21, 23, 26, 0.15)" />
+            <text x="70" y="355" fill="#738a94" font-size="11" text-anchor="end">0%</text>
+
+            <!-- Vertical threshold grid lines -->
+            {% for pt in svg_points %}
+              <line x1="{{ pt.x }}" y1="20" x2="{{ pt.x }}" y2="350" stroke="rgba(21, 23, 26, 0.05)" />
+              <text x="{{ pt.x }}" y="372" fill="#738a94" font-size="9" text-anchor="middle" transform="rotate(-25, {{ pt.x }}, 372)">
+                ${{ pt.threshold|intword }}
+              </text>
+            {% endfor %}
+
+            <!-- Draw Curve Area under path -->
+            <path d="M 80 350 L {% for pt in svg_points %}{{ pt.x }} {{ pt.y }} L {% endfor %} 760 350 Z" 
+                  fill="url(#exceedance-grad)" stroke="none" opacity="0.1" />
+
+            <!-- The main curve line -->
+            <path d="M {% for pt in svg_points %}{{ pt.x }} {{ pt.y }}{% if not forloop.last %} L {% endif %}{% endfor %}" 
+                  fill="none" stroke="#15171a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+            <!-- Highlight Dots -->
+            {% for pt in svg_points %}
+              <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="4" fill="#15171a" />
+              <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="8" fill="transparent" stroke="#15171a" stroke-width="1.5" opacity="0" class="svg-glow-dot" style="transition: opacity 0.2s;">
+                <title>${{ pt.threshold|intcomma }} Exceedance Probability: {{ pt.probability }}%</title>
+              </circle>
+            {% endfor %}
+
+            <!-- Definitions -->
+            <defs>
+              <linearGradient id="exceedance-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#15171a" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoping and Metadata Summary -->
+    <div class="col-lg-5">
+      <div class="risk-card h-100">
+        <h3 class="h5 mb-3">&#128309; Scoped Threat Parameters</h3>
+        <table class="table table-borderless table-sm small mb-0">
+          <tbody>
+            <tr class="border-bottom">
+              <td class="text-muted py-2" style="width: 35%;">Scenario</td>
+              <td class="text-dark py-2 fw-bold">{{ scenario.name }}</td>
+            </tr>
+            <tr class="border-bottom">
+              <td class="text-muted py-2">Asset at Risk</td>
+              <td class="text-dark py-2">{{ scenario.asset }}</td>
+            </tr>
+            <tr class="border-bottom">
+              <td class="text-muted py-2">Threat Agent</td>
+              <td class="text-dark py-2">
+                {% if scenario.threat_agent %}
+                  {{ scenario.threat_agent.name }}
+                {% else %}
+                  {{ scenario.threat_agent_text|default:"Generic Threat Community" }}
+                {% endif %}
+              </td>
+            </tr>
+            <tr class="border-bottom">
+              <td class="text-muted py-2">Threat Effect</td>
+              <td class="text-dark py-2" style="color: var(--bi-accent-red) !important; font-weight: 600;">{{ scenario.get_threat_effect_display }}</td>
+            </tr>
+            <tr class="border-bottom">
+              <td class="text-muted py-2">Insurance Premium</td>
+              <td class="text-dark py-2">${{ scenario.insurance_premium|floatformat:0|intcomma }} / year</td>
+            </tr>
+            <tr>
+              <td class="text-muted py-2">Regulatory Multiplier</td>
+              <td class="text-dark py-2" style="color: var(--bi-accent-yellow) !important; font-weight: 600;">{{ scenario.regulatory_penalty_multiplier }}x scaling factor</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Calibration Inputs Grid -->
+        <h4 class="h6 mt-4 mb-3">&#127899; Calibrated Estimates Summary</h4>
+        <div class="row g-2">
+          <!-- TEF -->
+          <div class="col-6">
+            <div class="p-2 border border-light rounded bg-light text-center">
+              <div class="risk-label" style="font-size: 0.7rem;">Threat Event Freq (TEF)</div>
+              <div class="text-dark small fw-bold mt-1">
+                {{ run.tef_min }} &mdash; {{ run.tef_max }} / yr
+              </div>
+            </div>
+          </div>
+          <!-- Vuln -->
+          <div class="col-6">
+            <div class="p-2 border border-light rounded bg-light text-center">
+              <div class="risk-label" style="font-size: 0.7rem;">Vulnerability (Vuln)</div>
+              <div class="text-dark small fw-bold mt-1">
+                {% widthratio run.vuln_min 1 100 %}% &mdash; {% widthratio run.vuln_max 1 100 %}%
+              </div>
+            </div>
+          </div>
+          <!-- Primary Loss -->
+          <div class="col-6">
+            <div class="p-2 border border-light rounded bg-light text-center">
+              <div class="risk-label" style="font-size: 0.7rem;">Primary Loss</div>
+              <div class="text-dark small fw-bold mt-1">
+                ${{ run.primary_loss_min|intcomma }} &mdash; ${{ run.primary_loss_max|intcomma }}
+              </div>
+            </div>
+          </div>
+          <!-- Secondary Loss -->
+          <div class="col-6">
+            <div class="p-2 border border-light rounded bg-light text-center">
+              <div class="risk-label" style="font-size: 0.7rem;">Secondary Loss Mag</div>
+              <div class="text-dark small fw-bold mt-1">
+                ${{ run.secondary_loss_mag_min|intcomma }} &mdash; ${{ run.secondary_loss_mag_max|intcomma }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safeguard Planner & ROI Calculations -->
+  <div class="risk-card mb-4">
+    <h3 class="h5 mb-2">&#128304; Projected Safeguard Recommendations</h3>
+    <p class="text-muted small mb-4">
+      Recommended cyber controls and continuous risk authority simulations showing projected Vulnerability or Frequency reductions, ALE savings, and Return on Investment (ROI).
+    </p>
+
+    {% if run.safeguard_recommendations %}
+      <div class="row g-4">
+        {% for control in run.safeguard_recommendations %}
+          <div class="col-lg-4">
+            <div class="p-3 border border-light rounded bg-light h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h4 class="h6 fw-bold mb-1" style="color: var(--bi-text-primary) !important;">{{ control.name }}</h4>
+                <p class="text-muted small mb-3">{{ control.description }}</p>
+                
+                <div class="mb-3 border-bottom pb-2">
+                  <span class="badge badge-info me-1">{{ control.reduction }}</span>
+                  <span class="badge bg-secondary text-white">Cost: ${{ control.cost|floatformat:0|intcomma }}</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="d-flex justify-content-between mb-1 small text-muted">
+                  <span>Current Exposure:</span>
+                  <span>${{ control.before_avg|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1 small text-muted">
+                  <span>Projected Exposure:</span>
+                  <span class="text-success">${{ control.after_avg|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-2 mb-2 fw-bold text-dark">
+                  <span>Annual Savings:</span>
+                  <span class="text-success">+${{ control.savings|floatformat:0|intcomma }}</span>
+                </div>
+                
+                <!-- ROI calculation -->
+                <div class="p-2 rounded text-center {% if control.savings > control.cost %}bg-success bg-opacity-10 text-success{% else %}bg-secondary bg-opacity-10 text-muted{% endif %}" style="font-size: 0.85rem; font-weight: 600;">
+                  Net Benefit: ${{ control.net_benefit|floatformat:0|intcomma }} | 
+                  ROI: {{ control.roi_pct }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted small">No safeguard simulation recommendations available for this scenario.</p>
+    {% endif %}
+  </div>
+
+  <!-- Evidence & Rationales panel -->
+  <div class="risk-card">
+    <h3 class="h5 mb-3">&#128203; Analysis Evidence &amp; Rationales</h3>
+    <div class="row g-4">
+      <div class="col-md-6 border-end">
+        <h4 class="h6 fw-bold" style="color: var(--bi-text-primary) !important;">Threat &amp; Vulnerability Rationale</h4>
+        <div class="mb-3">
+          <label class="risk-label d-block">Threat Event Frequency (TEF)</label>
+          <blockquote class="text-dark small bg-light p-3 rounded border-start border-secondary mb-0">
+            {{ run.rationale.tef|default:"No rationale provided."|linebreaksbr }}
+          </blockquote>
+        </div>
+        <div class="mb-3">
+          <label class="risk-label d-block">Vulnerability (Vuln)</label>
+          <blockquote class="text-dark small bg-light p-3 rounded border-start border-secondary mb-0">
+            {{ run.rationale.vuln|default:"No rationale provided."|linebreaksbr }}
+          </blockquote>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h4 class="h6 fw-bold" style="color: var(--bi-text-primary) !important;">Financial Loss Rationale</h4>
+        <div class="mb-3">
+          <label class="risk-label d-block">Primary Loss Magnitude</label>
+          <blockquote class="text-dark small bg-light p-3 rounded border-start border-secondary mb-0">
+            {{ run.rationale.primary_loss|default:"No rationale provided."|linebreaksbr }}
+          </blockquote>
+        </div>
+        <div class="mb-3">
+          <label class="risk-label d-block">Secondary Loss Freq &amp; Magnitude</label>
+          <blockquote class="text-dark small bg-light p-3 rounded border-start border-secondary mb-0">
+            <strong>Frequency Rationale:</strong><br>
+            {{ run.rationale.secondary_loss_freq|default:"N/A"|linebreaksbr }}
+            <hr class="my-2 border-secondary">
+            <strong>Magnitude Rationale:</strong><br>
+            {{ run.rationale.secondary_loss_mag|default:"N/A"|linebreaksbr }}
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

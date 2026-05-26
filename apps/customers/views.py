@@ -5,14 +5,17 @@ from mongoengine import ValidationError as MongoValidationError
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseNotAllowed
 from django.utils.text import slugify
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 from apps.accounts.decorators import login_required, admin_required
-from .forms import CustomerForm
-from .models import Customer, Breach, IndustryInfo
+from apps.accounts.models import Organization, ROLE_ADMIN, ROLE_ANALYST
+from .forms import ThirdPartyForm, ThirdPartyCSVUploadForm
+from .models import ThirdParty, Breach, IndustryInfo
 from apps.threats.models import ThreatActor
 
-# Maps free-form customer industry text to the canonical sector names stored on ThreatActor.
+# Maps free-form third-party industry text to the canonical sector names stored on ThreatActor.
 # Each tuple is (regex_pattern, canonical_sector_name).  Multiple patterns can map to the
-# same sector; a customer may resolve to multiple sectors (e.g. "Aerospace & Defense" also
+# same sector; a third party may resolve to multiple sectors (e.g. "Aerospace & Defense" also
 # maps to "Defense").
 _CUSTOMER_SECTOR_MAP = [
     (r"financ|bank|insurance|invest|capital market", "Financial Services"),
@@ -34,8 +37,8 @@ _CUSTOMER_SECTOR_MAP = [
 ]
 
 
-def _normalize_customer_sector(sector: str) -> list[str]:
-    """Map a free-form customer industry string to one or more canonical sector names."""
+def _normalize_third_party_sector(sector: str) -> list[str]:
+    """Map a free-form third-party industry string to one or more canonical sector names."""
     text = (sector or "").lower()
     found = []
     for pattern, canonical in _CUSTOMER_SECTOR_MAP:
@@ -43,24 +46,61 @@ def _normalize_customer_sector(sector: str) -> list[str]:
             found.append(canonical)
     return found
 
+
 logger = logging.getLogger(__name__)
 
 
-def _allowed_customers(user):
-    """Return queryset of all active customers — all authenticated users may browse."""
-    return Customer.objects(is_active=True)
+from bson import ObjectId
+
+def _allowed_third_parties(user):
+    """
+    Returns a queryset of active third parties the user is authorized to view.
+    Platform admins can view all active third parties.
+    Analysts can only view third parties in their effective allowed list (user + organization).
+    """
+    if not user or not user.is_authenticated:
+        return ThirdParty.objects.none()
+
+    if getattr(user, "role", None) == "admin":
+        return ThirdParty.objects(is_active=True)
+
+    allowed_ids = user.effective_allowed_third_party_ids
+    return ThirdParty.objects(id__in=allowed_ids, is_active=True)
 
 
-def _get_allowed_customer(user, customer_id):
+def _get_allowed_third_party(user, third_party_id):
+    """
+    Fetches a specific third-party organization, strictly enforcing tenant boundaries.
+    Raises Http404 if the organization does not exist or the user is unauthorized.
+    """
+    if not user or not user.is_authenticated:
+        raise Http404("Unauthorized")
+
     try:
-        return Customer.objects.get(id=customer_id, is_active=True)
-    except Customer.DoesNotExist:
-        raise Http404
+        obj_id = ObjectId(third_party_id)
+    except Exception:
+        raise Http404("Invalid ID format")
+
+    if getattr(user, "role", None) == "admin":
+        try:
+            return ThirdParty.objects.get(id=obj_id, is_active=True)
+        except ThirdParty.DoesNotExist:
+            raise Http404("Not Found")
+
+    # Standard analyst check
+    allowed_ids = user.effective_allowed_third_party_ids
+    if obj_id not in allowed_ids:
+        raise Http404("Access Denied")
+
+    try:
+        return ThirdParty.objects.get(id=obj_id, is_active=True)
+    except ThirdParty.DoesNotExist:
+        raise Http404("Not Found")
 
 
 @login_required
-def customer_list(request):
-    qs = _allowed_customers(request.user)
+def third_party_list(request):
+    qs = _allowed_third_parties(request.user)
     breach_filter = request.GET.get("breach", "")
     if breach_filter == "yes":
         qs = qs.filter(has_known_breach=True)
@@ -74,15 +114,15 @@ def customer_list(request):
 
 
 @login_required
-def customer_detail(request, customer_id):
-    customer = _get_allowed_customer(request.user, customer_id)
-    recent_breaches = Breach.objects(customer=customer).order_by("-breach_date")[:5]
+def third_party_detail(request, third_party_id):
+    customer = _get_allowed_third_party(request.user, third_party_id)
+    recent_breaches = Breach.objects(third_party=customer).order_by("-breach_date")[:5]
 
     # Likely threat actors (WEP-scored)
-    # Normalise the free-form customer industry string to canonical sector names, then query
+    # Normalise the free-form industry string to canonical sector names, then query
     # actors whose target_industries list contains ANY of those canonical names.
     likely_actors = []
-    canonical_sectors = _normalize_customer_sector(
+    canonical_sectors = _normalize_third_party_sector(
         customer.industry.sector if customer.industry else ""
     )
     if canonical_sectors:
@@ -113,9 +153,9 @@ def customer_detail(request, customer_id):
 
 
 @login_required
-def breach_list(request, customer_id):
-    customer = _get_allowed_customer(request.user, customer_id)
-    breaches = Breach.objects(customer=customer).order_by("-breach_date")
+def breach_list(request, third_party_id):
+    customer = _get_allowed_third_party(request.user, third_party_id)
+    breaches = Breach.objects(third_party=customer).order_by("-breach_date")
     return render(request, "customers/breach_list.html", {
         "customer": customer,
         "breaches": breaches,
@@ -123,10 +163,19 @@ def breach_list(request, customer_id):
 
 
 @login_required
-@admin_required
-def customer_create(request):
+def third_party_create(request):
+    user = request.user
+    
+    # Enforce that standard analysts MUST belong to an organization to create third parties
+    if getattr(user, "role", None) != ROLE_ADMIN and not getattr(user, "organization", None):
+        messages.warning(
+            request,
+            "An organization association is required to manage third parties. Please update your profile with your Company Name. Instructions: Click on your profile name in the top right, enter a company name, and click save."
+        )
+        return redirect("accounts:profile")
+
     if request.method == "POST":
-        form = CustomerForm(request.POST)
+        form = ThirdPartyForm(request.POST)
         if form.is_valid():
             d = form.cleaned_data
             now = datetime.now(timezone.utc)
@@ -138,7 +187,7 @@ def customer_create(request):
             contract_dt = None
             if d["contract_exp_date"]:
                 contract_dt = datetime.combine(d["contract_exp_date"], datetime.min.time()).replace(tzinfo=timezone.utc)
-            customer = Customer(
+            customer = ThirdParty(
                 name=d["name"],
                 short_name=slugify(d["name"])[:50],
                 industry=industry,
@@ -151,25 +200,46 @@ def customer_create(request):
                 contract_exp_date=contract_dt,
                 created_at=now,
                 updated_at=now,
+                is_active=True
             )
             try:
                 customer.save()
             except MongoValidationError as exc:
-                logger.error("MongoEngine validation error on customer create: %s", exc)
-                form.add_error(None, "Could not save customer: %s" % exc)
+                logger.error("MongoEngine validation error on third party create: %s", exc)
+                form.add_error(None, "Could not save third party: %s" % exc)
                 return render(request, "customers/customer_form.html", {"form": form, "action": "Create"})
-            return redirect("customers:customer_detail", customer_id=str(customer.id))
+            
+            # Tenant association logic
+            if getattr(user, "role", None) == ROLE_ADMIN:
+                target_org_id = request.POST.get("organization_id")
+                if target_org_id:
+                    try:
+                        org = Organization.objects.get(id=ObjectId(target_org_id))
+                        org.third_parties.append(customer)
+                        org.save()
+                    except (Organization.DoesNotExist, Exception):
+                        logger.warning("Admin specified an invalid organization ID %s during creation", target_org_id)
+            else:
+                org = user.organization
+                org.reload()
+                org.third_parties.append(customer)
+                org.save()
+                
+            return redirect("customers:customer_detail", third_party_id=str(customer.id))
     else:
-        form = CustomerForm()
-    return render(request, "customers/customer_form.html", {"form": form, "action": "Create"})
+        form = ThirdPartyForm()
+    return render(request, "customers/customer_form.html", {
+        "form": form, 
+        "action": "Create",
+        "organizations": Organization.objects.all() if getattr(user, "role", None) == ROLE_ADMIN else None
+    })
 
 
 @login_required
-@admin_required
-def customer_edit(request, customer_id):
-    customer = _get_allowed_customer(request.user, customer_id)
+def third_party_edit(request, third_party_id):
+    customer = _get_allowed_third_party(request.user, third_party_id)
     if request.method == "POST":
-        form = CustomerForm(request.POST)
+        form = ThirdPartyForm(request.POST)
         if form.is_valid():
             d = form.cleaned_data
             industry = IndustryInfo(
@@ -194,12 +264,12 @@ def customer_edit(request, customer_id):
             try:
                 customer.save()
             except MongoValidationError as exc:
-                logger.error("MongoEngine validation error on customer edit %s: %s", customer_id, exc)
-                form.add_error(None, "Could not save customer: %s" % exc)
+                logger.error("MongoEngine validation error on third party edit %s: %s", third_party_id, exc)
+                form.add_error(None, "Could not save third party: %s" % exc)
                 return render(request, "customers/customer_form.html", {
                     "form": form, "action": "Edit", "customer": customer,
                 })
-            return redirect("customers:customer_detail", customer_id=str(customer.id))
+            return redirect("customers:customer_detail", third_party_id=str(customer.id))
     else:
         initial = {
             "name": customer.name,
@@ -214,7 +284,7 @@ def customer_edit(request, customer_id):
             "website_url": customer.website_url,
             "contract_exp_date": customer.contract_exp_date.date() if customer.contract_exp_date else None,
         }
-        form = CustomerForm(initial=initial)
+        form = ThirdPartyForm(initial=initial)
     return render(request, "customers/customer_form.html", {
         "form": form,
         "action": "Edit",
@@ -223,12 +293,124 @@ def customer_edit(request, customer_id):
 
 
 @login_required
-@admin_required
-def customer_delete(request, customer_id):
+def third_party_delete(request, third_party_id):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
-    customer = _get_allowed_customer(request.user, customer_id)
+    customer = _get_allowed_third_party(request.user, third_party_id)
     customer.is_active = False
     customer.updated_at = datetime.now(timezone.utc)
     customer.save()
     return redirect("customers:customer_list")
+
+
+import csv
+import io
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def third_party_csv_upload(request):
+    user = request.user
+    if getattr(user, "role", None) != ROLE_ADMIN and not getattr(user, "organization", None):
+        messages.warning(
+            request,
+            "An organization association is required to manage third parties. Please update your profile with your Company Name. Instructions: Click on your profile name in the top right, enter a company name, and click save."
+        )
+        return redirect("accounts:profile")
+
+    if request.method == "POST":
+        form = ThirdPartyCSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES["csv_file"]
+            try:
+                decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
+            except Exception:
+                messages.error(request, "Failed to decode the CSV file. Please ensure it is saved in UTF-8 format.")
+                return render(request, "customers/csv_upload.html", {"form": form})
+
+            reader = csv.DictReader(decoded_file)
+            required_cols = {"Name", "Website URL"}
+            if not reader.fieldnames or not required_cols.issubset(set(reader.fieldnames)):
+                messages.error(request, "Invalid CSV format. Missing mandatory columns: 'Name' and 'Website URL'.")
+                return render(request, "customers/csv_upload.html", {"form": form})
+
+            success_count = 0
+            fail_count = 0
+            errors = []
+            now = datetime.now(timezone.utc)
+            org = getattr(user, "organization", None)
+
+            for idx, row in enumerate(reader, start=2):
+                name = (row.get("Name") or "").strip()
+                website_url = (row.get("Website URL") or "").strip()
+
+                if not name:
+                    errors.append(f"Row {idx}: 'Name' is empty.")
+                    fail_count += 1
+                    continue
+
+                if website_url:
+                    scheme = website_url.split("://", 1)[0].lower()
+                    if scheme not in ("http", "https"):
+                        errors.append(f"Row {idx}: Website URL must start with http:// or https://")
+                        fail_count += 1
+                        continue
+
+                # Check for duplicates within user's visible ecosystem
+                allowed_qs = _allowed_third_parties(user)
+                if allowed_qs.filter(name__iexact=name).first():
+                    errors.append(f"Row {idx}: Third Party with name '{name}' already exists in your workspace.")
+                    fail_count += 1
+                    continue
+
+                try:
+                    industry = IndustryInfo(sector="", subsector="", naics_code=None)
+                    customer = ThirdParty(
+                        name=name,
+                        short_name=slugify(name)[:50],
+                        website_url=website_url or None,
+                        industry=industry,
+                        is_active=True,
+                        created_at=now,
+                        updated_at=now
+                    )
+                    customer.save()
+
+                    if getattr(user, "role", None) == ROLE_ADMIN:
+                        target_org_id = request.POST.get("organization_id")
+                        if target_org_id:
+                            try:
+                                target_org = Organization.objects.get(id=ObjectId(target_org_id))
+                                target_org.third_parties.append(customer)
+                                target_org.save()
+                            except Exception:
+                                pass
+                    else:
+                        if org:
+                            org.reload()
+                            org.third_parties.append(customer)
+                            org.save()
+
+                    success_count += 1
+                except Exception as exc:
+                    errors.append(f"Row {idx}: Database error: {str(exc)}")
+                    fail_count += 1
+
+            if success_count > 0:
+                messages.success(request, f"Successfully uploaded and active-provisioned {success_count} third parties.")
+            if fail_count > 0:
+                messages.warning(request, f"Failed to upload {fail_count} rows due to validation or duplicate constraints.")
+
+            return render(request, "customers/csv_upload.html", {
+                "form": form,
+                "errors": errors,
+                "success_count": success_count,
+                "fail_count": fail_count,
+                "organizations": Organization.objects.all() if getattr(user, "role", None) == ROLE_ADMIN else None
+            })
+    else:
+        form = ThirdPartyCSVUploadForm()
+
+    return render(request, "customers/csv_upload.html", {
+        "form": form,
+        "organizations": Organization.objects.all() if getattr(user, "role", None) == ROLE_ADMIN else None
+    })

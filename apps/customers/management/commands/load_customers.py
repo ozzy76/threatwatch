@@ -1,13 +1,13 @@
 """
-Load customers from a CSV file into MongoDB.
+Load third parties from a CSV file into MongoDB.
 
 Usage:
     python manage.py load_customers /path/to/company_naics_breach_research.csv
 
 Behaviour:
-  - Upserts on customer name (update existing, insert new).
+  - Upserts on third party name (update existing, insert new).
   - short_name is auto-slugified from name.
-  - Grants the importing analyst (--grant-user) access to all imported customers.
+  - Grants the importing analyst (--grant-user) access to all imported third parties.
   - Sets has_known_breach from the data_breach column (Y/N).
   - Adds website_url, naics_code, naics_title (→ sector) from CSV columns.
   - contract_exp_date stored when present; left null when blank.
@@ -20,21 +20,21 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.text import slugify
 
 from apps.accounts.models import User
-from apps.customers.models import Customer, IndustryInfo
+from apps.customers.models import ThirdParty, IndustryInfo
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Import / update customers from a CSV file"
+    help = "Import / update third parties from a CSV file"
 
     def add_arguments(self, parser):
-        parser.add_argument("csv_path", help="Path to the customer CSV file")
+        parser.add_argument("csv_path", help="Path to the third party CSV file")
         parser.add_argument(
             "--grant-user",
             dest="grant_user",
             default="",
-            help="Username to grant access to all imported customers",
+            help="Username to grant access to all imported third parties",
         )
 
     def handle(self, *args, **options):
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             imported_ids.append(customer.id)
 
         self.stdout.write(self.style.SUCCESS(
-            f"Imported/updated {len(imported_ids)} customers."
+            f"Imported/updated {len(imported_ids)} third parties."
         ))
 
         if grant_username:
@@ -68,7 +68,7 @@ class Command(BaseCommand):
         with open(path, newline="", encoding="utf-8") as fh:
             return list(csv.DictReader(fh))
 
-    def _upsert_customer(self, row: dict, now: datetime) -> Customer:
+    def _upsert_customer(self, row: dict, now: datetime) -> ThirdParty:
         name = row["customer"].strip()
         short_name = slugify(name)[:50]
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
                 except ValueError:
                     continue
 
-        existing = Customer.objects(name=name).first()
+        existing = ThirdParty.objects(name=name).first()
 
         if existing:
             existing.short_name = short_name
@@ -114,7 +114,7 @@ class Command(BaseCommand):
             self.stdout.write(f"  Updated: {name}")
             return existing
         else:
-            customer = Customer(
+            customer = ThirdParty(
                 name=name,
                 short_name=short_name,
                 industry=industry,
@@ -138,11 +138,11 @@ class Command(BaseCommand):
             ))
             return
 
-        existing_ids = {str(i) for i in user.allowed_customer_ids}
+        existing_ids = {str(i) for i in user.allowed_third_party_ids}
         new_ids = [cid for cid in customer_ids if str(cid) not in existing_ids]
-        user.allowed_customer_ids = list(user.allowed_customer_ids) + new_ids
+        user.allowed_third_party_ids = list(user.allowed_third_party_ids) + new_ids
         user.save()
         self.stdout.write(self.style.SUCCESS(
-            f"Granted {username} access to {len(new_ids)} new customer(s) "
-            f"({len(user.allowed_customer_ids)} total)."
+            f"Granted {username} access to {len(new_ids)} new third parties "
+            f"({len(user.allowed_third_party_ids)} total)."
         ))
