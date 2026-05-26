@@ -1,0 +1,461 @@
+/* ==========================================================================
+   The Eco-Cyber Metropolis - Design System & Layout Engine
+   ========================================================================== */
+
+/* Load Comic & Rounded Fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Share+Tech+Mono&display=swap');
+
+:root {
+  /* Theme Colors */
+  --ec-secure: #24C854;       /* Mint Emerald Green */
+  --ec-warning: #FFCC00;      /* Energy Amber Gold */
+  --ec-breached: #E52521;     /* Neon Crimson Red */
+  --ec-canvas: #5C94FC;       /* Sky Blue Background */
+  --ec-charcoal: #15171a;     /* Deep Comic Outline Charcoal */
+  --ec-white: #ffffff;
+  
+  /* Fonts */
+  --ec-font-title: 'Fredoka', 'Nunito', sans-serif;
+  --ec-font-body: 'Nunito', sans-serif;
+  --ec-font-mono: 'Share Tech Mono', monospace;
+}
+
+/* Rounded Header Styles */
+.ec-title {
+  font-family: var(--ec-font-title) !important;
+  font-weight: 700;
+  color: var(--ec-charcoal);
+  letter-spacing: -0.01em;
+}
+
+.ec-mono {
+  font-family: var(--ec-font-mono) !important;
+  letter-spacing: 0.05em;
+}
+
+/* --- COMIC CELL CONTAINER (Sleek Illustrative Design) --- */
+.ec-card {
+  background: var(--ec-white) !important;
+  border: 2.5px solid var(--ec-charcoal) !important;
+  border-radius: 20px !important;
+  box-shadow: 6px 6px 0px 0px var(--ec-charcoal) !important;
+  padding: 1.5rem;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15), 
+              box-shadow 0.2s ease !important;
+  color: var(--ec-charcoal) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.ec-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px var(--ec-charcoal) !important;
+}
+
+/* Comic Pill Buttons */
+.btn-ec-primary {
+  background-color: var(--ec-charcoal) !important;
+  color: var(--ec-white) !important;
+  border: 2.5px solid var(--ec-charcoal) !important;
+  border-radius: 50px !important;
+  font-family: var(--ec-font-title) !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.8rem !important;
+  box-shadow: 4px 4px 0px 0px var(--ec-secure) !important;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.15) !important;
+}
+
+.btn-ec-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--ec-secure) !important;
+  background-color: #24282d !important;
+  color: var(--ec-white) !important;
+}
+
+.btn-ec-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px 0px var(--ec-secure) !important;
+}
+
+.btn-ec-warning {
+  background-color: var(--ec-warning) !important;
+  color: var(--ec-charcoal) !important;
+  border: 2.5px solid var(--ec-charcoal) !important;
+  border-radius: 50px !important;
+  font-family: var(--ec-font-title) !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.8rem !important;
+  box-shadow: 4px 4px 0px 0px var(--ec-charcoal) !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-ec-warning:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--ec-charcoal) !important;
+}
+
+.btn-ec-outline {
+  background-color: transparent !important;
+  color: var(--ec-charcoal) !important;
+  border: 2.5px solid var(--ec-charcoal) !important;
+  border-radius: 50px !important;
+  font-family: var(--ec-font-title) !important;
+  font-weight: 600 !important;
+  padding: 0.6rem 1.8rem !important;
+  box-shadow: 4px 4px 0px 0px rgba(21, 23, 26, 0.1) !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-ec-outline:hover {
+  background-color: var(--ec-charcoal) !important;
+  color: var(--ec-white) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--ec-charcoal) !important;
+}
+
+/* Custom inputs */
+.ec-input, .ec-select {
+  border: 2.5px solid var(--ec-charcoal) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  font-family: var(--ec-font-body) !important;
+  box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.05) !important;
+  color: var(--ec-charcoal) !important;
+}
+
+.ec-input:focus, .ec-select:focus {
+  outline: none !important;
+  border-color: var(--ec-canvas) !important;
+  box-shadow: 0 0 0 3px rgba(92, 148, 252, 0.25) !important;
+}
+
+/* Retro Badge Statuses (Mushroom & Shell Icons) */
+.badge-mushroom {
+  background-color: var(--ec-white);
+  border: 2px solid var(--ec-charcoal);
+  color: var(--ec-charcoal);
+  border-radius: 12px;
+  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ec-font-title);
+  font-weight: 600;
+  box-shadow: 2px 2px 0px 0px var(--ec-charcoal);
+}
+
+.badge-mushroom::before {
+  content: "🍄";
+  margin-right: 6px;
+  animation: pulseScale 1.5s infinite ease-in-out;
+}
+
+.badge-shell {
+  background-color: var(--ec-white);
+  border: 2px solid var(--ec-charcoal);
+  color: var(--ec-charcoal);
+  border-radius: 12px;
+  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ec-font-title);
+  font-weight: 600;
+  box-shadow: 2px 2px 0px 0px var(--ec-charcoal);
+}
+
+.badge-shell::before {
+  content: "🐢";
+  margin-right: 6px;
+  animation: shellBlink 1s infinite alternate;
+}
+
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes shellBlink {
+  0% { filter: brightness(1) drop-shadow(0 0 0px var(--ec-breached)); }
+  100% { filter: brightness(1.2) drop-shadow(0 0 5px var(--ec-breached)); color: var(--ec-breached); }
+}
+
+/* Mystery Box Dimmed Overlay */
+.mystery-lock-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(21, 23, 26, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 17px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mystery-lock-overlay:hover {
+  background-color: rgba(21, 23, 26, 0.9);
+}
+
+.mystery-block {
+  width: 70px;
+  height: 70px;
+  background-color: var(--ec-warning);
+  border: 3px solid var(--ec-charcoal);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px 0px var(--ec-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-family: var(--ec-font-title);
+  font-weight: 800;
+  color: var(--ec-charcoal);
+  margin-bottom: 0.75rem;
+  animation: floatMystery 2s infinite ease-in-out;
+}
+
+@keyframes floatMystery {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+
+/* ==========================================================================
+   Hyperloop State-Machine Styles
+   ========================================================================== */
+#hyperloop-container {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 72px); /* Subtract standard navigation header height */
+  overflow: hidden;
+  background-color: var(--ec-canvas);
+}
+
+.hyperloop-view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  overflow-y: auto;
+  padding: 2rem 1.5rem;
+  transition: transform 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045), 
+              opacity 0.4s ease, 
+              filter 0.4s ease;
+}
+
+/* --- STATE 1: DASHBOARD ACTIVE --- */
+.mode-command-center .command-center-view {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+}
+.mode-command-center .campaign-map-view {
+  transform: translateY(-100%) scale(0.85);
+  opacity: 0;
+}
+.mode-command-center .transit-tube-view {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+/* --- STATE 2: TRANSIT ANIMATING --- */
+.mode-transit .command-center-view {
+  opacity: 0;
+  transform: translateY(100%) scale(0.88);
+  filter: blur(8px);
+}
+.mode-transit .campaign-map-view {
+  opacity: 0;
+  transform: translateY(-100%) scale(0.88);
+  filter: blur(8px);
+}
+.mode-transit .transit-tube-view {
+  opacity: 1;
+  pointer-events: auto;
+  background-color: #07101E;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(0) scale(1);
+}
+
+.speed-lines-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 100% 40px;
+  animation: scrollLines 0.3s linear infinite;
+}
+
+@keyframes scrollLines {
+  0% { background-position-y: 0px; }
+  100% { background-position-y: -400px; }
+}
+
+.transit-status-card {
+  text-align: center;
+  color: var(--ec-secure);
+  font-family: var(--ec-font-mono);
+  letter-spacing: 2px;
+  z-index: 5;
+}
+
+/* --- STATE 3: CAMPAIGN MAP ACTIVE --- */
+.mode-campaign-map .transit-tube-view {
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+.mode-campaign-map .command-center-view {
+  opacity: 0;
+  transform: translateY(100%) scale(0.85);
+}
+.mode-campaign-map .campaign-map-view {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15), opacity 0.4s ease;
+}
+
+
+/* ==========================================================================
+   Campaign Map Layout Canvas
+   ========================================================================== */
+.overworld-canvas {
+  position: relative;
+  background: radial-gradient(circle at center, #7ca8ff 0%, #5C94FC 100%);
+  border-radius: 24px;
+  border: 3.5px solid var(--ec-charcoal);
+  box-shadow: 10px 10px 0px 0px var(--ec-charcoal);
+  padding: 3rem 1.5rem;
+  min-height: 550px;
+}
+
+.overworld-path {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.overworld-node {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.overworld-node-anchor {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 3px solid var(--ec-charcoal);
+  background-color: var(--ec-white);
+  box-shadow: 4px 4px 0px 0px var(--ec-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-family: var(--ec-font-title);
+  color: var(--ec-charcoal);
+  text-decoration: none !important;
+  cursor: pointer;
+  position: relative;
+}
+
+.overworld-node:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.overworld-node.completed .overworld-node-anchor {
+  background-color: var(--ec-secure);
+  color: var(--ec-white);
+}
+
+.overworld-node.locked .overworld-node-anchor {
+  background-color: #8c9096;
+  color: #dfdfdf;
+  cursor: not-allowed;
+}
+
+.overworld-node-tooltip {
+  position: absolute;
+  bottom: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--ec-charcoal);
+  color: var(--ec-white);
+  font-family: var(--ec-font-title);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+/* Sentry Droid Helper Chat Bubble */
+.sentry-mascot-container {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  margin-top: 1rem;
+}
+
+.sentry-mascot-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2.5px solid var(--ec-charcoal);
+  background-color: var(--ec-white);
+  box-shadow: 3px 3px 0px 0px var(--ec-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  z-index: 5;
+}
+
+.sentry-speech-bubble {
+  background-color: var(--ec-white);
+  border: 2.5px solid var(--ec-charcoal);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0px 0px var(--ec-charcoal);
+  padding: 0.75rem 1.25rem;
+  margin-left: 12px;
+  color: var(--ec-charcoal);
+  font-family: var(--ec-font-body);
+  position: relative;
+  max-width: 320px;
+}
+
+.sentry-speech-bubble::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 10px 6px 0;
+  border-color: transparent var(--ec-charcoal) transparent transparent;
+}
+
+.sentry-speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 10px 6px 0;
+  border-color: transparent var(--ec-white) transparent transparent;
+}

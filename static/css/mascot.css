@@ -1,0 +1,95 @@
+/* threatwatch/static/css/mascot.css */
+
+#global-mascot-anchor {
+    height: 60px;
+    width: 60px;
+    cursor: pointer;
+}
+
+.mascot-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.mascot-sprite {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+/* --- STATE A: IDLE HOVER --- */
+.mascot-container.is-idle .state-idle {
+    opacity: 1;
+    animation: droidHover 3s ease-in-out infinite;
+}
+.mascot-container.is-idle .mascot-shadow {
+    animation: shadowScale 3s ease-in-out infinite;
+}
+
+/* --- STATE B: ACTION SPRING JUMP --- */
+.mascot-container.is-celebrating .state-action {
+    opacity: 1;
+    animation: droidJump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes droidHover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+@keyframes shadowScale {
+    0%, 100% { transform: scale(1); opacity: 0.25; }
+    50% { transform: scale(0.8); opacity: 0.12; }
+}
+@keyframes droidJump {
+    0% { transform: scale(1) translateY(0); }
+    20% { transform: scale(1.2, 0.8) translateY(3px); } /* Squash */
+    50% { transform: scale(0.8, 1.2) translateY(-18px) rotate(8deg); } /* Stretch & leap */
+    72% { transform: scale(1.05, 0.95) translateY(1px); } /* Cushion landing */
+    100% { transform: scale(1) translateY(0); }
+}
+
+.mascot-shadow {
+    width: 32px;
+    height: 5px;
+    background: rgba(7, 16, 30, 0.25);
+    border-radius: 50%;
+    position: absolute;
+    bottom: -4px;
+    left: 14px;
+}
+
+/* --- CONTEXTUAL SPEECH BUBBLE --- */
+#mascot-speech-bubble {
+    width: 240px;
+    right: 75px;
+    top: 50%;
+    transform: translateY(-50%) scale(0);
+    transform-origin: right center;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    opacity: 0;
+    z-index: 1050;
+    border-radius: 12px !important;
+}
+
+/* Comic-strip pointer widget */
+#mascot-speech-bubble::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #212529;
+}
+
+#mascot-speech-bubble.is-visible {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+}

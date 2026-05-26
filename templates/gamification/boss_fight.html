@@ -1,0 +1,1877 @@
+{% extends "base.html" %}
+{% block title %}Boss Fight - Security Quest{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- ==========================================
+       WORLD 1 BOSS: ASSET INVENTORY REPORT
+       ========================================== -->
+  {% if world_id == "world_1" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-white relative mb-4">
+          <div class="text-center mb-5">
+            <span class="fs-1 mb-2 d-block animate-bounce">👑</span>
+            <h1 class="fw-extrabold text-black mb-1">World 1 Boss Fight: Kingdom Mapped!</h1>
+            <p class="lead text-muted">Generating and verifying your organization's SCF Asset Inventory Baseline...</p>
+          </div>
+
+          <!-- Printable Inventory Invoice Card Layout -->
+          <div class="printable-report p-4 border rounded-3 bg-light mb-4 shadow-sm" id="printableReport">
+            <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+              <div>
+                <h3 class="fw-bold text-black mb-1">&#128274; ThreatWatch Compliance Ledger</h3>
+                <small class="text-muted">Dynamic Security Control Framework (SCF) Asset Mapping</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success py-2 px-3 rounded-pill">AST VERIFIED</span>
+                <div class="small text-muted mt-2">Verified: {% now "Y-m-d H:i" %} UTC</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Subject Workspace</small>
+                <strong>{{ user.company_name }}</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Subject Industry Vector</small>
+                <strong>{{ user.business_industry|title }}</strong>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered text-center align-middle">
+                <thead>
+                  <tr class="table-dark">
+                    <th>Control Reference</th>
+                    <th>Audit Title</th>
+                    <th>Evaluated Parameters</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="fw-bold">AST-01, AST-04</td>
+                    <td>Physical Assets</td>
+                    <td>Hardware ledger & inventory verified via persona tracking</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">AST-02, AST-05</td>
+                    <td>Cloud Outposts</td>
+                    <td>Multi-tenant Cloud architectures & outposts successfully mapped</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">AST-03</td>
+                    <td>Digital Arsenal</td>
+                    <td>Operating platforms, browser clients, & local builds cataloged</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="small text-muted text-center mt-3 mb-0">Report digitally signed by ThreatWatch Security Quest Engine version 2026.05.25</p>
+          </div>
+
+          <!-- Descriptive labels per persona -->
+          <div class="p-4 rounded-3 border bg-warning-light text-warning-dark mb-4">
+            <h5 class="fw-bold mb-2">🏆 Boss Victory Message:</h5>
+            <p class="mb-0 fs-5">
+              {% if active_persona == "BUSINESS_OWNER" %}
+                Look at that! We’ve mapped your entire kingdom. You have secure shields over your devices, cloud vaults, and digital perimeters. You've earned 200 Gems and your business is officially 15% more secure because we know exactly what we are defending.
+              {% else %}
+                Asset discovery initialization pipeline finalized. Core baseline established for all audited hardware, software, and cloud items. Generating comprehensive audit logs for dynamic SCF system alignment validation. +200 Gems allocated.
+              {% endif %}
+            </p>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <!-- Print button -->
+            <button class="btn btn-outline-dark rounded-pill px-4" onclick="printW1Report()"><span class="fs-5 me-2">🖨️</span>Print Asset Report</button>
+            
+            <!-- Download JSON option -->
+            <a href="data:text/json;charset=utf-8,{{ user.node_completions|urlencode }}" download="ThreatWatch_Asset_Inventory.json" class="btn btn-outline-secondary rounded-pill px-4">
+              <span class="fs-5 me-2">💾</span>Download JSON Ledger
+            </a>
+
+            <!-- Claim rewards form -->
+            <form method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success rounded-pill px-5 shadow">Complete World 1 & Unlock World 2</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+  <!-- ==========================================
+       WORLD 2 BOSS: INTERACTIVE BREACH SIMULATOR
+       ========================================== -->
+  {% elif world_id == "world_2" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="breachCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-danger animate-pulse">🚨</span>
+            <h1 class="fw-extrabold text-neon-cyan mb-1">Cyber Security Breach Simulator</h1>
+            <p class="text-white-50">Threat Actor: <strong>Brute_Force_Botnet_04</strong> is targeting your login endpoints!</p>
+          </div>
+
+          <!-- Arcade Terminal Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="arcadeScreen">
+            <div class="scanlines"></div>
+            <div id="terminalLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Initializing attack defense sandbox...</span><br>
+              <span class="text-warning">[ATTACKER] Resolving DNS perimeter targets...</span><br>
+              <span class="text-warning">[ATTACKER] Spawning credentials dictionary cracking list...</span><br>
+            </div>
+
+            <!-- Defensive Laser Shield canvas simulation -->
+            <canvas id="laserCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Custom synth audio controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="bossAudioToggle" checked>
+            <label class="form-check-label text-muted" for="bossAudioToggle">🔊 Defensive Sound FX Active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="simulatorTriggerBox">
+            <button class="btn btn-danger btn-lg rounded-pill px-5 shadow" onclick="runBreachSimulation()">Initiate Cyber Defense Evaluation</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if MFA missing) -->
+          <div id="wizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">🧙‍♂️ Mascot Defender Alert: Remediation Needed!</h5>
+            <p class="small text-white-50 mb-3">
+              Oh no! Your logins lacked multi-factor verification, allowing the automated dictionaries to breach the administrative gateways. Don't worry, we'll fix it!
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Action Item: Enable unique credentials and Multi-Factor Auth globally across SaaS and VPN ports to defend the fortress!
+            </div>
+          </div>
+
+          <!-- Complete World 2 form -->
+          <form method="POST" id="world2SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <h4 class="fw-extrabold text-neon-cyan mb-3">🛡️ Identity Access Policy Document Signed!</h4>
+            <button type="submit" class="btn btn-cyan btn-lg rounded-pill px-5 shadow">Claim "The Gatekeeper's Crest" & +300 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 3 BOSS: MALWARE AIRSHIP BOMBARDMENT
+       ========================================== -->
+  {% elif world_id == "world_3" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="airshipCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-warning animate-bounce">🛸</span>
+            <h1 class="fw-extrabold text-neon-cyan mb-1">World 3 Boss Battle: Malware Airship Bombardment</h1>
+            <p class="text-white-50">Bowser's fleet of cyber airships is raining down malicious malware shell payloads!</p>
+          </div>
+
+          <!-- Arcade Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="airshipScreen" style="background: linear-gradient(to bottom, #111e11, #070d07);">
+            <div class="scanlines"></div>
+            <div id="airshipLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Initializing canopy defenses...</span><br>
+              <span class="text-warning">[AIRSHIP] Positioning fleet above endpoints...</span><br>
+              <span class="text-warning">[AIRSHIP] Commencing payload bombardment sequence...</span><br>
+            </div>
+
+            <!-- Canvas for shield and exploding bombs -->
+            <canvas id="airshipCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="airshipAudioToggle" checked>
+            <label class="form-check-label text-muted" for="airshipAudioToggle">🔊 Star-Theme defensive Audio active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="airshipTriggerBox">
+            <button class="btn btn-warning btn-lg rounded-pill px-5 shadow text-dark fw-bold" onclick="runAirshipSimulation()">Engage Canopy Shields</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if EDR or patch is missing) -->
+          <div id="airshipWizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">🔥 Airship Fire Flower Remediation Guide</h5>
+            <p class="small text-white-50 mb-3">
+              KABOOM! The malware shells bypassed your local endpoints because EDR monitoring or patching SLAs were lacking. But fear not, we can patch the holes with this fire flower checklist!
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Remediation Plan: Deploy Behavioral EDR across all user laptops and enforce strict automatic patch updates within 14 days.
+            </div>
+          </div>
+
+          <!-- Printable Policy Card Layout -->
+          <div class="printable-report p-4 border rounded-3 bg-light text-dark mb-4 shadow-sm d-none" id="printableW3Report">
+            <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+              <div>
+                <h3 class="fw-bold text-black mb-1">🛡️ Standard Endpoint Security Policy</h3>
+                <small class="text-muted">Dynamic Security Control Framework (SCF) Alignment Ledger</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success py-2 px-3 rounded-pill">END COMPLIANT</span>
+                <div class="small text-muted mt-2">Verified: {% now "Y-m-d H:i" %} UTC</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Organization</small>
+                <strong>{{ user.company_name }}</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Status</small>
+                <strong class="text-success">Passed and Fortified</strong>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered text-center align-middle">
+                <thead>
+                  <tr class="table-dark">
+                    <th>Control ID</th>
+                    <th>Audit Area</th>
+                    <th>Configured Details</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="fw-bold">END-01, END-02</td>
+                    <td>Deployed Endpoint Armor</td>
+                    <td>EDR platform protection active and monitored</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">END-06</td>
+                    <td>Vulnerability Remediation</td>
+                    <td>Fast-tracked patching SLA under 14 days active</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">END-03, IAC-04</td>
+                    <td>Least Privilege Rights</td>
+                    <td>Default standard user roles enforced, admin restricted</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="small text-muted text-center mt-3 mb-0">Policy validated & signed by ThreatWatch Security Quest Engine version 2026.05.26</p>
+          </div>
+
+          <!-- Claim rewards form -->
+          <form method="POST" id="world3SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <div class="mb-4">
+              <button class="btn btn-outline-light rounded-pill px-4 me-3" type="button" onclick="printW3Report()"><span class="fs-5 me-2">🖨️</span>Print Policy Document</button>
+            </div>
+            <h4 class="fw-extrabold text-neon-cyan mb-3">🛡️ Endpoint Armor Canopy Policy Registered!</h4>
+            <button type="submit" class="btn btn-warning btn-lg rounded-pill px-5 shadow text-dark fw-bold">Claim "The Iron Outpost Badge" & +400 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 4 BOSS: UNDERGROUND VAULT BANDIT HEIST
+       ========================================== -->
+  {% elif world_id == "world_4" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="vaultCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-warning animate-bounce">🪙</span>
+            <h1 class="fw-extrabold text-neon-cyan mb-1">World 4 Boss Battle: Underground Vault Bandit Heist</h1>
+            <p class="text-white-50">A sneaky bandit has infiltrated the subterranean corridors trying to ransack your golden chests!</p>
+          </div>
+
+          <!-- Arcade Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="vaultScreen" style="background: linear-gradient(to bottom, #1e1a0f, #0d0a05);">
+            <div class="scanlines"></div>
+            <div id="vaultLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Infiltration sensor alert triggered in main storage vault...</span><br>
+              <span class="text-warning">[BANDIT] Attempting file retrieval and encryption block bypass...</span><br>
+            </div>
+
+            <!-- Canvas for vault coins and scrambled blocks -->
+            <canvas id="vaultCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="vaultAudioToggle" checked>
+            <label class="form-check-label text-muted" for="vaultAudioToggle">🔊 Bandit footsteps and alarm chimes active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="vaultTriggerBox">
+            <button class="btn btn-gold btn-lg rounded-pill px-5 shadow text-dark fw-bold" style="background-color: #ffd700;" onclick="runVaultSimulation()">Defend Database Chests</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if encryption is missing) -->
+          <div id="vaultWizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">🗝️ Security Specialist Remediation Guide</h5>
+            <p class="small text-white-50 mb-3">
+              Oh no! The bandit made off with shiny gold coins because either your storage at rest lacked AES-256 ciphers or your transiting files were completely in unencrypted plaintext. Let's fix this breach!
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Action Checklist: Enable AES-256 REST_ENCRYPTED database keys and enforce mandatory SSL/TLS transits globally.
+            </div>
+          </div>
+
+          <!-- Printable Policy Card Layout -->
+          <div class="printable-report p-4 border rounded-3 bg-light text-dark mb-4 shadow-sm d-none" id="printableW4Report">
+            <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+              <div>
+                <h3 class="fw-bold text-black mb-1">🔒 Data Protection and Privacy Standards Ledger</h3>
+                <small class="text-muted">Dynamic Security Control Framework (SCF) Cryptographic Policy</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success py-2 px-3 rounded-pill">DAT COMPLIANT</span>
+                <div class="small text-muted mt-2">Verified: {% now "Y-m-d H:i" %} UTC</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Subject</small>
+                <strong>{{ user.company_name }} Data Vaults</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Status</small>
+                <strong class="text-success">Highly Classified and Sealed</strong>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered text-center align-middle">
+                <thead>
+                  <tr class="table-dark">
+                    <th>Control Reference</th>
+                    <th>Audit Title</th>
+                    <th>Cryptographic Measures</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="fw-bold">DAT-01, PRI-01</td>
+                    <td>Data Classification</td>
+                    <td>Structured classifications active with granular owners</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">CRY-01, DAT-02</td>
+                    <td>Encryption At Rest</td>
+                    <td>AES-256-GCM cipher vaults active on raw data lockers</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">CRY-03</td>
+                    <td>Encryption In Transit</td>
+                    <td>Enforced SSL/TLS secure courier transport active</td>
+                    <td><span class="text-success fw-bold">✓ COMPLIANT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="small text-muted text-center mt-3 mb-0">Cryptographic audit signed by ThreatWatch Security Quest Engine version 2026.05.26</p>
+          </div>
+
+          <!-- Claim rewards form -->
+          <form method="POST" id="world4SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <div class="mb-4">
+              <button class="btn btn-gold btn-lg rounded-pill px-4 me-3 text-dark fw-bold" style="background-color: #ffd700;" type="button" onclick="printW4Report()"><span class="fs-5 me-2">🖨️</span>Print Standards Ledger</button>
+            </div>
+            <h4 class="fw-extrabold text-neon-cyan mb-3">🛡️ Data Protection Standards Document Registered!</h4>
+            <button type="submit" class="btn btn-gold btn-lg rounded-pill px-5 shadow text-dark fw-bold" style="background-color: #ffd700;">Claim "Master of the Vault Key" & +500 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 5 BOSS: DDOS STORM TRAFFIC FLOOD
+       ========================================== -->
+  {% elif world_id == "world_5" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="ddosCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-danger animate-pulse">⚡</span>
+            <h1 class="fw-extrabold text-neon-cyan mb-1">World 5 Boss Battle: DDoS Traffic Flood</h1>
+            <p class="text-white-50">An incoming high-volume botnet flood is attempting to choke your network boundaries!</p>
+          </div>
+
+          <!-- Arcade Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="ddosScreen" style="background: linear-gradient(to bottom, #101a24, #080e14);">
+            <div class="scanlines"></div>
+            <div id="ddosLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Initializing network defense monitors...</span><br>
+              <span class="text-warning">[TRAFFIC] Normal ingest active (230 kbps)...</span><br>
+              <span class="text-danger">[ALERT] Unexpected traffic spike detected: 1.2 Mpps (Syn-Flood pattern)!</span><br>
+            </div>
+
+            <!-- Canvas for packets and firewall shield -->
+            <canvas id="ddosCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="ddosAudioToggle" checked>
+            <label class="form-check-label text-muted" for="ddosAudioToggle">🔊 Storm warning alarms active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="ddosTriggerBox">
+            <button class="btn btn-primary btn-lg rounded-pill px-5 shadow" onclick="runDdosSimulation()">Initiate Boundary Filter</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if non-compliant) -->
+          <div id="ddosWizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">🛡️ Boundary Specialist Remediation Guide</h5>
+            <p class="small text-white-50 mb-3">
+              Oh no! The network storm fully exhausted the port capacity because your perimeter lacked shielded firewalls or guest isolation protocols. Let's fix this!
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Action Checklist: Configure stateful edge filters (NET-01) and separate SSIDs with dedicated VLAN boundaries.
+            </div>
+          </div>
+
+          <!-- Complete World 5 form -->
+          <form method="POST" id="world5SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <h4 class="fw-extrabold text-neon-cyan mb-3">🛡️ Secure Perimeter Alignment Certified!</h4>
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow">Claim "The Grid Shield Badge" & +400 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 6 BOSS: COMPLIANCE AUDIT SHOWDOWN
+       ========================================== -->
+  {% elif world_id == "world_6" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-white text-dark relative mb-4">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-success animate-bounce">⚖️</span>
+            <h1 class="fw-extrabold text-black mb-1">World 6 Boss Battle: Royal Audit Showdown</h1>
+            <p class="lead text-muted">A Royal Inspector is examining your governance policies and training records...</p>
+          </div>
+
+          <!-- Auditor Terminal Screen -->
+          <div class="arcade-terminal p-4 rounded-3 bg-light border mb-4 font-monospace relative" id="auditScreen" style="background-color: #f8f9fa !important; border: 3px solid #15171a !important; color: #15171a !important; box-shadow: none;">
+            <div id="auditLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Inspector entering active directory scope...</span><br>
+              <span class="text-dark fw-bold">[INSPECTOR] Checking active administrative decrees...</span><br>
+            </div>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="auditAudioToggle" checked>
+            <label class="form-check-label text-muted" for="auditAudioToggle">🔊 Audit chime feedback active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="auditTriggerBox">
+            <button class="btn btn-dark btn-lg rounded-pill px-5 shadow" onclick="runAuditSimulation()">Present Governance Portfolio</button>
+          </div>
+
+          <!-- Printable Auditor Ledger -->
+          <div class="printable-report p-4 border rounded-3 bg-light text-dark mb-4 shadow-sm d-none" id="printableW6Report">
+            <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+              <div>
+                <h3 class="fw-bold text-black mb-1">⚖️ Governance and Training Alignment Ledger</h3>
+                <small class="text-muted">Dynamic Security Control Framework (SCF) Regulatory Audit</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success py-2 px-3 rounded-pill">GOV CERTIFIED</span>
+                <div class="small text-muted mt-2">Verified: {% now "Y-m-d H:i" %} UTC</div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered text-center align-middle">
+                <thead>
+                  <tr class="table-dark">
+                    <th>Control Reference</th>
+                    <th>Audit Area</th>
+                    <th>Remediation Coverage</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="fw-bold">SAT-01, SAT-03</td>
+                    <td>Security Training</td>
+                    <td>Regular courses & phishing exercises active</td>
+                    <td><span class="text-success fw-bold">✓ 100% COMPLIANT</span></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-bold">GOV-01, PPL-01</td>
+                    <td>Decree Adoption</td>
+                    <td>Official Security Policy adopted and signed</td>
+                    <td><span class="text-success fw-bold">✓ 100% COMPLIANT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Complete World 6 form -->
+          <form method="POST" id="world6SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <div class="mb-4">
+              <button class="btn btn-outline-dark rounded-pill px-4 me-3" type="button" onclick="printW6Report()"><span class="fs-5 me-2">🖨|</span>Print Inspector's Ledger</button>
+            </div>
+            <h4 class="fw-extrabold text-success mb-3">🛡️ Governance Audit Passed Successfully!</h4>
+            <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 shadow">Claim "The Chancellor's Stamp" & +500 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 7 BOSS: LIVE TELEMETRY INTEGRATION
+       ========================================== -->
+  {% elif world_id == "world_7" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="telemetryCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-success animate-pulse">📡</span>
+            <h1 class="fw-extrabold text-neon-cyan mb-1">World 7 Boss Battle: Telemetry Ledger Integration</h1>
+            <p class="text-white-50">Connecting continuous audit loggers to secure write-once centralized platforms...</p>
+          </div>
+
+          <!-- Arcade Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="telemetryScreen" style="background: linear-gradient(to bottom, #0d1b15, #050d0a);">
+            <div class="scanlines"></div>
+            <div id="telemetryLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Connecting log ingestors...</span><br>
+              <span class="text-warning">[MONITOR] Interrogating infrastructure transactions...</span><br>
+            </div>
+
+            <!-- Canvas for log flow streams -->
+            <canvas id="telemetryCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="telemetryAudioToggle" checked>
+            <label class="form-check-label text-muted" for="telemetryAudioToggle">🔊 continuous monitoring feedback active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="telemetryTriggerBox">
+            <button class="btn btn-success btn-lg rounded-pill px-5 shadow" onclick="runTelemetrySimulation()">Inbound Sync Audit</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if non-compliant) -->
+          <div id="telemetryWizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">🤖 Security Specialist Remediation Guide</h5>
+            <p class="small text-white-50 mb-3">
+              Oh no! Integrity check failed because logs were written to local plain text files which are editable by bad actors.
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Action Checklist: Configure immutable central syslog forwarding (A&A-02) and active watchtower probes.
+            </div>
+          </div>
+
+          <!-- Complete World 7 form -->
+          <form method="POST" id="world7SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <h4 class="fw-extrabold text-neon-cyan mb-3">🛡️ Central Syslog Integrity Audited!</h4>
+            <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 shadow">Claim "Watchtower Sentry" Badge & +500 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+  <!-- ==========================================
+       WORLD 8 BOSS: BOWSER RANSOMWARE SHOWDOWN
+       ========================================== -->
+  {% elif world_id == "world_8" %}
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        
+        <div class="card p-4 p-md-5 shadow-lg border-0 bg-dark text-white relative mb-4" id="ransomCard">
+          <div class="text-center mb-4">
+            <span class="fs-1 mb-2 d-block text-danger animate-bounce">👿</span>
+            <h1 class="fw-extrabold text-neon-red mb-1">Final Boss Fight: Bowser Ransomware Showdown</h1>
+            <p class="text-white-50">Bowser's Ransomware Trojan is trying to lock down your central city databases!</p>
+          </div>
+
+          <!-- Arcade Screen -->
+          <div class="arcade-terminal p-4 rounded-3 mb-4 font-monospace relative" id="ransomScreen" style="background: linear-gradient(to bottom, #1f0b0d, #0d0203);">
+            <div class="scanlines"></div>
+            <div id="ransomLog" style="min-height: 200px; max-height: 250px; overflow-y: auto;">
+              <span class="text-muted">[SYSTEM] Warning: Root directories locking...</span><br>
+              <span class="text-danger">[BOWSER] Ha-ha! Pay me 1000 Coins or lose your data!</span><br>
+            </div>
+
+            <!-- Canvas for ransomware impact -->
+            <canvas id="ransomCanvas" class="w-100 h-100 position-absolute top-0 left-0" style="pointer-events: none; mix-blend-mode: screen;"></canvas>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="form-check form-switch text-center mb-3">
+            <input class="form-check-input" type="checkbox" id="ransomAudioToggle" checked>
+            <label class="form-check-label text-muted" for="ransomAudioToggle">🔊 Epic showdown battle chimes active</label>
+          </div>
+
+          <!-- Controls to launch simulation -->
+          <div class="text-center" id="ransomTriggerBox">
+            <button class="btn btn-danger btn-lg rounded-pill px-5 shadow text-white fw-bold" onclick="runRansomSimulation()">Launch Incident Response</button>
+          </div>
+
+          <!-- Wizard guidance card (renders if non-compliant) -->
+          <div id="ransomWizardCard" class="mt-4 p-4 border rounded bg-dark border-danger d-none">
+            <h5 class="fw-extrabold text-danger mb-2">⚔️ Security Specialist Incident Remediation Guide</h5>
+            <p class="small text-white-50 mb-3">
+              Oh no! Bowser compromised your local servers and encryptor scripts because air-gapped backup capsules were absent. Let's recover!
+            </p>
+            <div class="alert alert-warning border-0 small text-black fw-bold mb-0">
+              💡 Action Checklist: Replicate system states into isolated storage (DRP-01) and enforce structured SLA intervals!
+            </div>
+          </div>
+
+          <!-- Printable Playbook -->
+          <div class="printable-report p-4 border rounded-3 bg-light text-dark mb-4 shadow-sm d-none" id="printableW8Report">
+            <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+              <div>
+                <h3 class="fw-bold text-black mb-1">⚔️ ThreatWatch Incident Response Playbook</h3>
+                <small class="text-muted">Dynamic Security Control Framework (SCF) Resilience Standard</small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-success py-2 px-3 rounded-pill">DRP STANDARDS</span>
+                <div class="small text-muted mt-2">Verified: {% now "Y-m-d H:i" %} UTC</div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Recovery RPO SLA</small>
+                <strong>24 Hours</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted uppercase fw-bold d-block">Recovery RTO SLA</small>
+                <strong>4 Hours</strong>
+              </div>
+            </div>
+
+            <p class="small text-muted mb-0">Congratulations on securing your Kingdom! Download this officially signed corporate Disaster Recovery standard.</p>
+          </div>
+
+          <!-- Complete World 8 form -->
+          <form method="POST" id="world8SubmitForm" class="d-none text-center mt-4">
+            {% csrf_token %}
+            <div class="mb-4">
+              <button class="btn btn-danger btn-lg rounded-pill px-4 me-3 text-white fw-bold" type="button" onclick="printW8Report()"><span class="fs-5 me-2">🖨️</span>Print Response Playbook</button>
+            </div>
+            <h4 class="fw-extrabold text-neon-cyan mb-3">👑 Victory! Bowser Defeated & Kingdom Saved!</h4>
+            <button type="submit" class="btn btn-neon-cyan btn-lg rounded-pill px-5 shadow" style="background-color: #00ffff; color: black; font-weight: bold;">Claim "Savior of the Kingdom" Badge & +1000 Gems</button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- Styles for terminal, neon borders, printable invoice elements -->
+<style>
+  .font-monospace { font-family: 'Courier New', Courier, monospace; }
+  
+  /* Report light variables */
+  .bg-warning-light { background-color: #fcfdf5; border-color: #ffe082; }
+  .text-warning-dark { color: #f57f17; }
+
+  /* Arcade Terminal Styling */
+  .arcade-terminal {
+    background-color: #0c0e12;
+    border: 3px solid #202b33;
+    box-shadow: 0 0 20px rgba(0,255,255,0.15);
+    color: #39ff14;
+    overflow: hidden;
+  }
+  .scanlines {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .text-neon-cyan {
+    color: #00ffff !important;
+    text-shadow: 0 0 10px rgba(0,255,255,0.8);
+  }
+  .text-neon-red {
+    color: #ff007f !important;
+    text-shadow: 0 0 10px rgba(255,0,127,0.8);
+  }
+  .btn-cyan {
+    background-color: #00ffff;
+    border-color: #00ffff;
+    color: #000;
+  }
+  .btn-cyan:hover {
+    background-color: #00cccc;
+    border-color: #00cccc;
+    color: #000;
+  }
+
+  /* Audio indicators */
+  .glow-red-danger {
+    box-shadow: 0 0 40px rgba(255, 0, 127, 0.4) !important;
+    border-color: #ff007f !important;
+  }
+
+  /* Print Specific Page Styles */
+  @media print {
+    body * { visibility: hidden !important; }
+    
+    body.print-w1 #printableReport, body.print-w1 #printableReport * { visibility: visible !important; }
+    body.print-w3 #printableW3Report, body.print-w3 #printableW3Report * { visibility: visible !important; }
+    body.print-w4 #printableW4Report, body.print-w4 #printableW4Report * { visibility: visible !important; }
+    body.print-w6 #printableW6Report, body.print-w6 #printableW6Report * { visibility: visible !important; }
+    body.print-w8 #printableW8Report, body.print-w8 #printableW8Report * { visibility: visible !important; }
+    
+    #printableReport, #printableW3Report, #printableW4Report, #printableW6Report, #printableW8Report {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: white !important;
+    }
+  }
+
+  /* Custom terminal shake animation CSS */
+  @keyframes terminal-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(0px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(2px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(2px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
+  .shake-terminal {
+    animation: terminal-shake 0.3s;
+    animation-iteration-count: infinite;
+  }
+</style>
+
+<script>
+  // --- Audio Sound FX ---
+  function playAudioFX(type) {
+    // Determine if audio is checked on active panel
+    let enabled = false;
+    const w2Toggle = document.getElementById('bossAudioToggle');
+    const w3Toggle = document.getElementById('airshipAudioToggle');
+    const w4Toggle = document.getElementById('vaultAudioToggle');
+    const w5Toggle = document.getElementById('ddosAudioToggle');
+    const w6Toggle = document.getElementById('auditAudioToggle');
+    const w7Toggle = document.getElementById('telemetryAudioToggle');
+    const w8Toggle = document.getElementById('ransomAudioToggle');
+    
+    if (w2Toggle && w2Toggle.checked) enabled = true;
+    if (w3Toggle && w3Toggle.checked) enabled = true;
+    if (w4Toggle && w4Toggle.checked) enabled = true;
+    if (w5Toggle && w5Toggle.checked) enabled = true;
+    if (w6Toggle && w6Toggle.checked) enabled = true;
+    if (w7Toggle && w7Toggle.checked) enabled = true;
+    if (w8Toggle && w8Toggle.checked) enabled = true;
+    
+    if (!enabled) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (type === 'laser') {
+        // High-pitched laser blast
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.3);
+        osc.type = 'sawtooth';
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      } else if (type === 'breach' || type === 'explosion') {
+        // Heavy low-pitched explosion
+        const osc = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(120, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(40, ctx.currentTime + 0.8);
+        osc.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(100, ctx.currentTime);
+        osc2.frequency.linearRampToValueAtTime(30, ctx.currentTime + 0.8);
+        osc2.type = 'triangle';
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
+        osc.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc2.start();
+        osc.stop(ctx.currentTime + 0.8);
+        osc2.stop(ctx.currentTime + 0.8);
+      } else if (type === 'shock') {
+        // Buzzing high voltage electric shock
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(180, ctx.currentTime);
+        osc.type = 'square';
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.frequency.setValueAtTime(45, ctx.currentTime);
+        lfoGain.gain.setValueAtTime(120, ctx.currentTime);
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        lfo.start();
+        osc.start();
+        lfo.stop(ctx.currentTime + 0.4);
+        osc.stop(ctx.currentTime + 0.4);
+      } else if (type === 'success_chime') {
+        // Glorious arpeggio chime
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.frequency.setValueAtTime(f, ctx.currentTime);
+          osc.type = 'triangle';
+          gain.gain.setValueAtTime(0.0, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05 + (idx * 0.05));
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.0);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + (idx * 0.05));
+          osc.stop(ctx.currentTime + 1.0);
+        });
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // --- World 2 Breach Simulator ---
+  function runBreachSimulation() {
+    const isMfaCompliant = ("{{ mfa_value }}" === "COMPLIANT");
+    
+    // Hide launch button
+    document.getElementById('simulatorTriggerBox').classList.add('d-none');
+    
+    const log = document.getElementById('terminalLog');
+    const logs = [
+      "🛡️ Attacker brute-force algorithm spawned...",
+      "🛡️ Cracking attempt 1: user='admin' pwd='password123' ...",
+      "🛡️ Cracking attempt 2: user='ceo' pwd='company2026' ...",
+      "🛡️ Dictionary matches password signature! Gateway requesting next validation phase..."
+    ];
+
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-warning">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        evaluatePerimeterResult(isMfaCompliant);
+      }
+    }, 1000);
+  }
+
+  function evaluatePerimeterResult(compliant) {
+    const log = document.getElementById('terminalLog');
+    const card = document.getElementById('breachCard');
+    
+    if (compliant) {
+      // SUCCESS DEFENSE PATH
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] MFA credentials security gate triggered globally.</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      
+      playAudioFX('laser');
+      animateShieldLaser();
+
+      setTimeout(() => {
+        log.innerHTML += `<span class="text-success">[VICTORY] Attacker brute-force waves successfully deflected! Threat actor disconnected. Gateway secure.</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        playAudioFX('success_chime');
+        document.getElementById('world2SubmitForm').classList.remove('d-none');
+      }, 1500);
+
+    } else {
+      // BREACHED PATH
+      card.classList.add('glow-red-danger');
+      log.innerHTML += `<span class="text-neon-red">[BREACH] Alert: Port 443 Administrative access credentials stolen! Lacking secondary MFA factor.</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      
+      playAudioFX('breach');
+      animateScreenShatter();
+
+      setTimeout(() => {
+        log.innerHTML += `<span class="text-neon-red">[FATAL] Central identity vault compromised. System administrative tokens exported. Emergency mitigating actions required!</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        document.getElementById('wizardCard').classList.remove('d-none');
+        document.getElementById('world2SubmitForm').classList.remove('d-none');
+      }, 1500);
+    }
+  }
+
+  // Visual lasers
+  function animateShieldLaser() {
+    const canvas = document.getElementById('laserCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+
+    let progress = 0;
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      
+      // Draw neon shield center
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 70 + Math.sin(progress) * 5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 15;
+      ctx.stroke();
+
+      // Laser beams shooting out from center outward
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, canvas.height / 2);
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.strokeStyle = '#39ff14';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      progress += 0.1;
+      if (progress < 15) {
+        requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+      }
+    }
+    draw();
+  }
+
+  // Screen shatter lines
+  function animateScreenShatter() {
+    const canvas = document.getElementById('laserCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2, canvas.height/2);
+    for (let i = 0; i < 8; i++) {
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.moveTo(canvas.width/2, canvas.height/2);
+    }
+    ctx.strokeStyle = '#f05230';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  // --- World 3 Airship Simulation ---
+  function runAirshipSimulation() {
+    const isEndCompliant = ("{{ edr_value }}" === "EDR_COMPLIANT" && "{{ patch_value }}" === "fast_remediation");
+    
+    document.getElementById('airshipTriggerBox').classList.add('d-none');
+    const log = document.getElementById('airshipLog');
+    const screen = document.getElementById('airshipScreen');
+    
+    const logs = [
+      "🛸 [AIRSHIP] Loading payload 'Malware_Bomb_01'...",
+      "🛸 [AIRSHIP] Launching high-frequency zero-day executable bursts...",
+      "🛡️ [SYSTEM] Scanning canopy defensive metrics..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-warning">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        animateAirshipBombs(isEndCompliant, log, screen);
+      }
+    }, 800);
+  }
+
+  function animateAirshipBombs(compliant, log, screen) {
+    const canvas = document.getElementById('airshipCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+    
+    let bombs = [];
+    let particles = [];
+    let shieldGlow = 0;
+    const maxBombs = 12;
+    let bombsLaunched = 0;
+    let frameId;
+    
+    const shieldR = 150;
+    
+    function spawnBomb() {
+      if (bombsLaunched < maxBombs) {
+        bombs.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          speed: 3 + Math.random() * 3,
+          radius: 6
+        });
+        bombsLaunched++;
+      }
+    }
+    
+    spawnBomb();
+    const spawnTimer = setInterval(spawnBomb, 300);
+    
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      
+      // Draw shield/canopy
+      ctx.beginPath();
+      if (compliant) {
+        ctx.arc(canvas.width / 2, canvas.height, shieldR, Math.PI, 2 * Math.PI);
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(shieldGlow) * 0.3})`;
+        ctx.lineWidth = 6;
+        ctx.shadowColor = '#00ffff';
+        ctx.shadowBlur = 15;
+      } else {
+        ctx.arc(canvas.width / 2, canvas.height, shieldR, Math.PI, 2 * Math.PI);
+        ctx.strokeStyle = "rgba(255, 0, 0, 0.15)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.shadowBlur = 0;
+      }
+      ctx.stroke();
+      ctx.setLineDash([]); 
+      shieldGlow += 0.15;
+      
+      // Update & Draw Bombs
+      for (let i = bombs.length - 1; i >= 0; i--) {
+        const b = bombs[i];
+        b.y += b.speed;
+        
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff007f';
+        ctx.shadowColor = '#ff007f';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        
+        // Check collision
+        if (compliant) {
+          const dx = b.x - (canvas.width / 2);
+          const dy = b.y - canvas.height;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist <= shieldR + b.radius && b.y < canvas.height - 20) {
+            playAudioFX('laser');
+            for (let p = 0; p < 6; p++) {
+              particles.push({
+                x: b.x,
+                y: b.y,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -Math.random() * 4 - 2,
+                color: '#00ffff',
+                life: 30
+              });
+            }
+            bombs.splice(i, 1);
+            continue;
+          }
+        } else {
+          if (b.y >= canvas.height - 10) {
+            playAudioFX('explosion');
+            screen.classList.add('shake-terminal');
+            setTimeout(() => screen.classList.remove('shake-terminal'), 200);
+            
+            for (let p = 0; p < 12; p++) {
+              particles.push({
+                x: b.x,
+                y: canvas.height - 10,
+                vx: (Math.random() - 0.5) * 8,
+                vy: -Math.random() * 8,
+                color: '#ff5500',
+                life: 45
+              });
+            }
+            bombs.splice(i, 1);
+            continue;
+          }
+        }
+        
+        if (b.y > canvas.height + 20) {
+          bombs.splice(i, 1);
+        }
+      }
+      
+      // Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 0;
+        ctx.fill();
+        
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      if (bombs.length > 0 || bombsLaunched < maxBombs || particles.length > 0) {
+        frameId = requestAnimationFrame(draw);
+      } else {
+        clearInterval(spawnTimer);
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        evaluateAirshipResult(compliant, log);
+      }
+    }
+    
+    draw();
+  }
+
+  function evaluateAirshipResult(compliant, log) {
+    if (compliant) {
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] Active EDR sensor logs mapped correctly. Canopy shields fully deployed.</span><br>`;
+      log.innerHTML += `<span class="text-success">[VICTORY] Outstanding defense! Bowser's malware fleet repelled. Endpoint security standard achieved!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      playAudioFX('success_chime');
+      document.getElementById('printableW3Report').classList.remove('d-none');
+      document.getElementById('world3SubmitForm').classList.remove('d-none');
+    } else {
+      log.innerHTML += `<span class="text-neon-red">[BREACH] Fatal malware payload detonated on unpatched endpoint vectors!</span><br>`;
+      log.innerHTML += `<span class="text-neon-red">[FATAL] Ransomware lock file placed across subnet directories. Remediation mandated!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      document.getElementById('airshipWizardCard').classList.remove('d-none');
+      document.getElementById('world3SubmitForm').classList.remove('d-none');
+    }
+  }
+
+  // --- World 4 Vault Simulation ---
+  function runVaultSimulation() {
+    const isDatCompliant = ("{{ vault_status }}" === "REST_ENCRYPTED" && "{{ transit_status }}" === "true");
+    
+    document.getElementById('vaultTriggerBox').classList.add('d-none');
+    const log = document.getElementById('vaultLog');
+    const screen = document.getElementById('vaultScreen');
+    
+    const logs = [
+      "🪙 [SYSTEM] Subterranean vault perimeter sensors alerting...",
+      "🪙 [BANDIT] Thief attempting data extraction on primary database schema...",
+      "🛡️ [SYSTEM] Reading cryptographic cipher configurations..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-warning">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        animateVaultDefenders(isDatCompliant, log, screen);
+      }
+    }, 800);
+  }
+
+  function animateVaultDefenders(compliant, log, screen) {
+    const canvas = document.getElementById('vaultCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+    
+    let coins = [
+      { x: canvas.width * 0.2, y: canvas.height - 30, active: true },
+      { x: canvas.width * 0.35, y: canvas.height - 30, active: true },
+      { x: canvas.width * 0.5, y: canvas.height - 30, active: true },
+      { x: canvas.width * 0.65, y: canvas.height - 30, active: true },
+      { x: canvas.width * 0.8, y: canvas.height - 30, active: true }
+    ];
+    
+    let bandit = {
+      x: canvas.width / 2,
+      y: -20,
+      vx: 3,
+      vy: 2,
+      targetCoinIndex: 0,
+      state: 'diving', 
+      shockTimer: 0
+    };
+    
+    let sparks = [];
+    let frameId;
+    let tick = 0;
+    
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      tick++;
+      
+      coins.forEach(c => {
+        if (c.active) {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffd700'; 
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 1;
+          ctx.shadowColor = '#ffd700';
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.stroke();
+        }
+      });
+      ctx.shadowBlur = 0; 
+      
+      const barrierY = canvas.height - 60;
+      if (compliant) {
+        ctx.beginPath();
+        ctx.moveTo(0, barrierY);
+        ctx.lineTo(canvas.width, barrierY);
+        ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = '#00ff00';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+        ctx.font = '10px monospace';
+        for (let i = 0; i < canvas.width; i += 40) {
+          ctx.fillText((tick % 2 === 0 ? "1011" : "0110"), i, barrierY - 5);
+        }
+      }
+      
+      if (bandit.state === 'diving') {
+        bandit.y += bandit.vy;
+        bandit.x += Math.sin(tick * 0.1) * 3; 
+        
+        if (compliant && bandit.y >= barrierY - 15) {
+          bandit.state = 'shocked';
+          bandit.shockTimer = 40;
+          playAudioFX('shock');
+          
+          for (let p = 0; p < 15; p++) {
+            sparks.push({
+              x: bandit.x,
+              y: bandit.y,
+              vx: (Math.random() - 0.5) * 10,
+              vy: (Math.random() - 0.5) * 10 - 2,
+              color: '#ffff00',
+              life: 30
+            });
+          }
+        } else if (bandit.y >= canvas.height - 35) {
+          playAudioFX('breach');
+          screen.classList.add('shake-terminal');
+          setTimeout(() => screen.classList.remove('shake-terminal'), 200);
+          
+          coins.forEach(c => c.active = false);
+          
+          log.innerHTML += `<span class="text-neon-red">[BANDIT] Stole database record segment! Payload unencrypted!</span><br>`;
+          log.scrollTop = log.scrollHeight;
+          
+          bandit.state = 'escaping';
+          bandit.vy = -4;
+        }
+      } else if (bandit.state === 'shocked') {
+        bandit.y -= 3; 
+        bandit.shockTimer--;
+        
+        ctx.beginPath();
+        ctx.moveTo(bandit.x, bandit.y);
+        ctx.lineTo(bandit.x + (Math.random() - 0.5) * 30, bandit.y + (Math.random() - 0.5) * 30);
+        ctx.strokeStyle = '#ffff00';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        if (bandit.shockTimer <= 0) {
+          bandit.state = 'escaping';
+          bandit.vy = -4;
+        }
+      } else if (bandit.state === 'escaping') {
+        bandit.y += bandit.vy;
+      }
+      
+      if (bandit.y > -40 && bandit.y < canvas.height + 40) {
+        ctx.beginPath();
+        ctx.moveTo(bandit.x, bandit.y - 12);
+        ctx.lineTo(bandit.x - 10, bandit.y + 10);
+        ctx.lineTo(bandit.x + 10, bandit.y + 10);
+        ctx.closePath();
+        ctx.fillStyle = '#8a2be2'; 
+        ctx.strokeStyle = '#ff007f';
+        ctx.lineWidth = 1;
+        ctx.shadowColor = '#8a2be2';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        ctx.beginPath();
+        ctx.arc(bandit.x - 3, bandit.y, 2, 0, Math.PI*2);
+        ctx.arc(bandit.x + 3, bandit.y, 2, 0, Math.PI*2);
+        ctx.fillStyle = '#ff0000';
+        ctx.fill();
+      }
+      
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life--;
+        
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.fill();
+        
+        if (s.life <= 0) {
+          sparks.splice(i, 1);
+        }
+      }
+      
+      if (bandit.y > -30 && (bandit.state !== 'escaping' || bandit.y > -30) || sparks.length > 0) {
+        frameId = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        evaluateVaultResult(compliant, log);
+      }
+    }
+    
+    draw();
+  }
+
+  function evaluateVaultResult(compliant, log) {
+    if (compliant) {
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] AES-256 cipher vectors validated. Courier transit encrypted.</span><br>`;
+      log.innerHTML += `<span class="text-success">[VICTORY] Cryptographic shields fully protected database chests. Intruder repelled!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      playAudioFX('success_chime');
+      document.getElementById('printableW4Report').classList.remove('d-none');
+      document.getElementById('world4SubmitForm').classList.remove('d-none');
+    } else {
+      log.innerHTML += `<span class="text-neon-red">[BREACH] High severity breach! Bandit extracted unencrypted schema data tables.</span><br>`;
+      log.innerHTML += `<span class="text-neon-red">[FATAL] Plaintext database files compromised. Immediate remediation required!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      document.getElementById('vaultWizardCard').classList.remove('d-none');
+      document.getElementById('world4SubmitForm').classList.remove('d-none');
+    }
+  }
+
+  // --- World 5: DDoS Simulation ---
+  function runDdosSimulation() {
+    const isNetCompliant = ("{{ firewall_status }}" === "FIREWALL_COMPLIANT" && "{{ wifi_status }}" === "segmented_secure");
+    document.getElementById('ddosTriggerBox').classList.add('d-none');
+    const log = document.getElementById('ddosLog');
+    const screen = document.getElementById('ddosScreen');
+    
+    const logs = [
+      "⚡ [MONITOR] Launching packet mitigation filters...",
+      "⚡ [SYSTEM] Ingesting real-time flow rate thresholds...",
+      "🛡️ [SYSTEM] Running boundary check against active policies..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-warning">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        animateDdosPackets(isNetCompliant, log, screen);
+      }
+    }, 800);
+  }
+
+  function animateDdosPackets(compliant, log, screen) {
+    const canvas = document.getElementById('ddosCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+    
+    let packets = [];
+    let sparks = [];
+    const totalPackets = 15;
+    let packetsSpawned = 0;
+    let tick = 0;
+    let frameId;
+    const shieldY = canvas.height - 50;
+    
+    function spawnPacket() {
+      if (packetsSpawned < totalPackets) {
+        packets.push({
+          x: Math.random() * canvas.width,
+          y: -10,
+          speed: 4 + Math.random() * 4,
+          radius: 4
+        });
+        packetsSpawned++;
+      }
+    }
+    
+    spawnPacket();
+    const spawnTimer = setInterval(spawnPacket, 200);
+    
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      tick++;
+      
+      // Draw Firewall Barrier Line
+      ctx.beginPath();
+      if (compliant) {
+        ctx.moveTo(0, shieldY);
+        ctx.lineTo(canvas.width, shieldY);
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = '#00ffff';
+        ctx.shadowBlur = 15;
+      } else {
+        ctx.moveTo(0, shieldY);
+        ctx.lineTo(canvas.width, shieldY);
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
+      
+      // Move and draw packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const p = packets[i];
+        p.y += p.speed;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff0055';
+        ctx.fill();
+        
+        if (compliant) {
+          if (p.y >= shieldY - 5) {
+            playAudioFX('laser');
+            for (let k=0; k<5; k++) {
+              sparks.push({
+                x: p.x, y: shieldY,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -Math.random() * 4 - 1,
+                color: '#00ffff', life: 20
+              });
+            }
+            packets.splice(i, 1);
+            continue;
+          }
+        } else {
+          if (p.y >= canvas.height - 10) {
+            playAudioFX('explosion');
+            screen.classList.add('shake-terminal');
+            setTimeout(() => screen.classList.remove('shake-terminal'), 150);
+            for (let k=0; k<5; k++) {
+              sparks.push({
+                x: p.x, y: canvas.height - 10,
+                vx: (Math.random() - 0.5) * 8,
+                vy: -Math.random() * 6,
+                color: '#ff5500', life: 25
+              });
+            }
+            packets.splice(i, 1);
+            continue;
+          }
+        }
+        
+        if (p.y > canvas.height + 10) packets.splice(i, 1);
+      }
+      
+      // Draw Sparks
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life--;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 2, 0, Math.PI*2);
+        ctx.fillStyle = s.color;
+        ctx.fill();
+        if (s.life <= 0) sparks.splice(i, 1);
+      }
+      
+      if (packets.length > 0 || packetsSpawned < totalPackets || sparks.length > 0) {
+        frameId = requestAnimationFrame(draw);
+      } else {
+        clearInterval(spawnTimer);
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        evaluateDdosResult(compliant, log);
+      }
+    }
+    draw();
+  }
+
+  function evaluateDdosResult(compliant, log) {
+    if (compliant) {
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] Stateful filtering rules validated. Rogue traffic drops success.</span><br>`;
+      log.innerHTML += `<span class="text-success">[VICTORY] Outstanding! The boundary firewall fully absorbed the traffic flood! Boundary secure.</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      playAudioFX('success_chime');
+      document.getElementById('world5SubmitForm').classList.remove('d-none');
+    } else {
+      log.innerHTML += `<span class="text-neon-red">[BREACH] Edge gateways overwhelmed! Port buffer overflow detected.</span><br>`;
+      log.innerHTML += `<span class="text-neon-red">[FATAL] Terminal offline. DDoS storm has successfully saturated your perimeter!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      document.getElementById('ddosWizardCard').classList.remove('d-none');
+      document.getElementById('world5SubmitForm').classList.remove('d-none');
+    }
+  }
+
+  // --- World 6: Compliance Audit Showdown ---
+  function runAuditSimulation() {
+    document.getElementById('auditTriggerBox').classList.add('d-none');
+    const log = document.getElementById('auditLog');
+    
+    const lines = [
+      "⚖️ [INSPECTOR] Opening Security Awareness Training portfolio...",
+      "⚖️ [INSPECTOR] Parsing training logs and roster allocations... Verified!",
+      "⚖️ [INSPECTOR] Checking active administrative decrees...",
+      "⚖️ [INSPECTOR] Verifying policy signing certificates... Adopted!",
+      "⚖️ [INSPECTOR] Compiling final regulatory audit ledger..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < lines.length) {
+        log.innerHTML += `<span class="text-dark fw-bold">${lines[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        log.innerHTML += `<span class="text-success fw-extrabold">[AUDIT SUCCESS] 100% compliant. Formal authorization to operate (ATO) granted!</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        playAudioFX('success_chime');
+        document.getElementById('printableW6Report').classList.remove('d-none');
+        document.getElementById('world6SubmitForm').classList.remove('d-none');
+      }
+    }, 1000);
+  }
+
+  // --- World 7: Live Telemetry Integration ---
+  function runTelemetrySimulation() {
+    const isMonCompliant = ("{{ logbook_status }}" === "immutable_vault");
+    document.getElementById('telemetryTriggerBox').classList.add('d-none');
+    const log = document.getElementById('telemetryLog');
+    
+    const logs = [
+      "📡 [SYSTEM] Verifying remote Syslog channel configurations...",
+      "📡 [SYSTEM] Examining log bucket immutability standards...",
+      "🔍 [SYSTEM] Searching audit records for active tampering checks..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-warning">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        animateTelemetryLogflow(isMonCompliant, log);
+      }
+    }, 800);
+  }
+
+  function animateTelemetryLogflow(compliant, log) {
+    const canvas = document.getElementById('telemetryCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+    
+    let streams = [];
+    const maxStreams = 20;
+    let ticks = 0;
+    let frameId;
+    
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      ticks++;
+      
+      if (ticks % 3 === 0 && streams.length < maxStreams) {
+        streams.push({
+          x: Math.random() * canvas.width,
+          y: -20,
+          speed: 2 + Math.random() * 3,
+          val: Math.random() > 0.5 ? "LOG_ST_0" : "SYS_AA_2"
+        });
+      }
+      
+      for (let i = streams.length - 1; i >= 0; i--) {
+        const s = streams[i];
+        s.y += s.speed;
+        
+        ctx.font = '9px monospace';
+        ctx.fillStyle = compliant ? 'rgba(36, 200, 84, 0.7)' : 'rgba(229, 37, 33, 0.7)';
+        ctx.fillText(s.val, s.x, s.y);
+        
+        if (s.y > canvas.height + 20) {
+          streams.splice(i, 1);
+        }
+      }
+      
+      if (ticks < 120) {
+        frameId = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        evaluateTelemetryResult(compliant, log);
+      }
+    }
+    draw();
+  }
+
+  function evaluateTelemetryResult(compliant, log) {
+    if (compliant) {
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] Immutable Syslog storage validation verified (WORM match!).</span><br>`;
+      log.innerHTML += `<span class="text-success">[VICTORY] Log stream linked perfectly. Tamper-evident ledger registered. Continuous monitoring secure!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      playAudioFX('success_chime');
+      document.getElementById('world7SubmitForm').classList.remove('d-none');
+    } else {
+      log.innerHTML += `<span class="text-neon-red">[ALERT] Plaintext local log files detected! Storage buckets missing WORM lock check.</span><br>`;
+      log.innerHTML += `<span class="text-neon-red">[FATAL] Access audit integrity failed! Potential log deletion vectors open.</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      document.getElementById('telemetryWizardCard').classList.remove('d-none');
+      document.getElementById('world7SubmitForm').classList.remove('d-none');
+    }
+  }
+
+  // --- World 8: Bowser Ransomware Showdown ---
+  function runRansomSimulation() {
+    const isResCompliant = ("{{ backup_status }}" === "isolated_capsule");
+    document.getElementById('ransomTriggerBox').classList.add('d-none');
+    const log = document.getElementById('ransomLog');
+    const screen = document.getElementById('ransomScreen');
+    
+    const logs = [
+      "👿 [BOWSER] Executing file encryptor ransomware on raw block devices...",
+      "🚨 [SYSTEM] Panic mode: central volume index table encrypted!",
+      "🛡️ [SYSTEM] Searching repository network for isolated backup states..."
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < logs.length) {
+        log.innerHTML += `<span class="text-danger">${logs[index]}</span><br>`;
+        log.scrollTop = log.scrollHeight;
+        index++;
+      } else {
+        clearInterval(interval);
+        animateRansomwareFight(isResCompliant, log, screen);
+      }
+    }, 800);
+  }
+
+  function animateRansomwareFight(compliant, log, screen) {
+    const canvas = document.getElementById('ransomCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+    
+    let tick = 0;
+    let particles = [];
+    let frameId;
+    
+    function draw() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      tick++;
+      
+      // Draw big padlock
+      ctx.font = '70px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("🔒", canvas.width / 2, canvas.height / 2 + Math.sin(tick * 0.1) * 10);
+      
+      if (compliant) {
+        // Draw green shield circle around the lock, slowly squeezing and breaking it
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 70 + Math.sin(tick * 0.1) * 5, 0, Math.PI * 2);
+        ctx.strokeStyle = '#24C854';
+        ctx.lineWidth = 5;
+        ctx.shadowColor = '#24C854';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        
+        // Beams breaking lock
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2 - 80, canvas.height / 2 - 80);
+        ctx.lineTo(canvas.width / 2 + 80, canvas.height / 2 + 80);
+        ctx.strokeStyle = '#24C854';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        if (tick === 50) {
+          playAudioFX('laser');
+          for (let p=0; p<15; p++) {
+            particles.push({
+              x: canvas.width / 2, y: canvas.height / 2,
+              vx: (Math.random() - 0.5) * 12,
+              vy: (Math.random() - 0.5) * 12,
+              color: '#24C854', life: 35
+            });
+          }
+        }
+      } else {
+        // Red lock grows larger and explodes slightly, shaking screen
+        if (tick % 10 === 0) {
+          playAudioFX('explosion');
+          screen.classList.add('shake-terminal');
+          setTimeout(() => screen.classList.remove('shake-terminal'), 200);
+          
+          for (let p=0; p<6; p++) {
+            particles.push({
+              x: canvas.width / 2 + (Math.random() - 0.5)*100,
+              y: canvas.height / 2 + (Math.random() - 0.5)*100,
+              vx: (Math.random() - 0.5) * 6,
+              vy: (Math.random() - 0.5) * 6,
+              color: '#ff0000', life: 25
+            });
+          }
+        }
+      }
+      
+      // Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life--;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+      
+      if (tick < 100 || particles.length > 0) {
+        frameId = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        evaluateRansomResult(compliant, log);
+      }
+    }
+    draw();
+  }
+
+  function evaluateRansomResult(compliant, log) {
+    if (compliant) {
+      log.innerHTML += `<span class="text-neon-cyan">[DEFENSE] Air-gapped Backup Capsules located. Isolating network interface.</span><br>`;
+      log.innerHTML += `<span class="text-success">[VICTORY] Decryption unnecessary! System state fully restored from external air-gapped backups. Bowser is defeated!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      playAudioFX('success_chime');
+      document.getElementById('printableW8Report').classList.remove('d-none');
+      document.getElementById('world8SubmitForm').classList.remove('d-none');
+    } else {
+      log.innerHTML += `<span class="text-neon-red">[FATAL] Local system backups compromised and encrypted by malware block!</span><br>`;
+      log.innerHTML += `<span class="text-neon-red">[ALERT] 100% of network databases encrypted. Recovery failed. Immediate playbook required!</span><br>`;
+      log.scrollTop = log.scrollHeight;
+      document.getElementById('ransomWizardCard').classList.remove('d-none');
+      document.getElementById('world8SubmitForm').classList.remove('d-none');
+    }
+  }
+
+  // --- Print helpers ---
+  function printW1Report() {
+    document.body.classList.add('print-w1');
+    window.print();
+    document.body.classList.remove('print-w1');
+  }
+  
+  function printW3Report() {
+    document.body.classList.add('print-w3');
+    window.print();
+    document.body.classList.remove('print-w3');
+  }
+  
+  function printW4Report() {
+    document.body.classList.add('print-w4');
+    window.print();
+    document.body.classList.remove('print-w4');
+  }
+
+  function printW6Report() {
+    document.body.classList.add('print-w6');
+    window.print();
+    document.body.classList.remove('print-w6');
+  }
+
+  function printW8Report() {
+    document.body.classList.add('print-w8');
+    window.print();
+    document.body.classList.remove('print-w8');
+  }
+</script>
+{% endblock %}

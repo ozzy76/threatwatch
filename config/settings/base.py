@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "apps.detections",
     "apps.reports",
     "apps.fair",
+    "apps.gamification",
 ]
 
 MIDDLEWARE = [

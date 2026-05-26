@@ -7,42 +7,68 @@
   <title>{% block title %}ThreatWatch{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/mtw.css' %}">
+  <link rel="stylesheet" href="{% static 'css/hyperloop.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mascot.css' %}">
 </head>
 <body>
   <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
 
   <header role="banner">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom" aria-label="Primary navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom" aria-label="Primary navigation" style="border-bottom: 2.5px solid #15171a !important;">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/">&#128274; ThreatWatch</a>
+        <a class="navbar-brand fw-bold ec-title" href="/" style="font-size: 1.6rem;">🔒 ThreatWatch</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarMain" aria-controls="navbarMain"
-                aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation" style="border: 2.5px solid #15171a;">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarMain">
           {% if request.user.is_authenticated %}
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="/">Third Parties</a>
+              <a class="nav-link fw-bold" href="/">Third Parties</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'fair:dashboard' %}">Quantified Risk</a>
+              <a class="nav-link fw-bold" href="{% url 'fair:dashboard' %}">Quantified Risk</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/threats/actors/">Threat Actors</a>
+              <a class="nav-link fw-bold" href="/threats/actors/">Threat Actors</a>
             </li>
             {% if request.user.role == "admin" %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'accounts:user_list' %}">Users</a>
+              <a class="nav-link fw-bold" href="{% url 'accounts:user_list' %}">Users</a>
             </li>
             {% endif %}
+            <li class="nav-item">
+              <a class="nav-link fw-bold text-success" href="/gamification/overworld/">🛡️ Security Quest</a>
+            </li>
           </ul>
           <div class="d-flex align-items-center">
-            <a href="{% url 'accounts:profile' %}" class="text-dark fw-semibold text-decoration-none me-3" id="profile-nav-link">&#128100; {{ request.user.username }}</a>
+            <!-- Dynamic Gems Pill -->
+            <div class="me-3 d-flex align-items-center badge-mushroom" style="box-shadow: 2px 2px 0px 0px #15171a !important; font-size: 0.9rem;" title="Security Gems Balance">
+              💎 <span id="nav-gems-balance" class="ec-mono ms-1 fw-bold">{{ request.user.security_gems_balance|default:0 }}</span>
+            </div>
+
+            <!-- Rich Animated Mascot Assistant Droid -->
+            <div class="position-relative d-flex align-items-center me-3" id="global-mascot-anchor" style="cursor: pointer; z-index: 1050;"
+                 data-persona="{{ request.user.active_persona|default:'UNASSIGNED' }}"
+                 data-progress="{{ request.user.current_progress_percentage|default:0 }}"
+                 onclick="handleMascotClick()">
+                <div id="mascot-speech-bubble" class="border border-2 border-dark rounded-3 bg-white p-2 shadow-sm position-absolute">
+                    <p id="mascot-commentary-text" class="m-0 small fw-bold text-dark"></p>
+                </div>
+                
+                <div class="mascot-container is-idle">
+                    <img src="{% static 'assets/mascot.png' %}" class="mascot-sprite state-idle" alt="Droid Idle Base">
+                    <img src="{% static 'assets/mascot1.png' %}" class="mascot-sprite state-action" alt="Droid Action Flare">
+                    <div class="mascot-shadow"></div>
+                </div>
+            </div>
+
+            <a href="{% url 'accounts:profile' %}" class="text-dark fw-bold text-decoration-none me-3" id="profile-nav-link" style="font-family: var(--ec-font-title);">&#128100; {{ request.user.username }}</a>
             <form method="post" action="/accounts/logout/" class="d-inline">
               {% csrf_token %}
-              <button type="submit" class="btn btn-outline-dark btn-sm">Logout</button>
+              <button type="submit" class="btn btn-outline-dark btn-sm fw-bold" style="border-radius: 20px; border-width: 2px;">Logout</button>
             </form>
           </div>
           {% endif %}
@@ -73,6 +99,7 @@
   </footer>
 
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/commentary.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

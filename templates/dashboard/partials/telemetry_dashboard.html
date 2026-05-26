@@ -1,0 +1,363 @@
+{% load static %}
+<div class="row g-4" style="font-family: var(--ec-font-body);">
+
+  <!-- LEFT COLUMN: SENTRY COMMAND HUB & RADAR STATUS -->
+  <div class="col-xl-4 col-lg-5">
+    
+    <!-- COMMAND CONTROLLER CARD -->
+    <div class="card ec-card p-4 mb-4 shadow-lg sticky-top" style="top: 24px; background-color: #ffffff !important;">
+      <div class="text-center mb-4 pb-3 border-bottom border-light">
+        <div class="avatar-ring mb-3" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--ec-charcoal); background-color: var(--ec-canvas); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+          <span class="fs-1">🚀</span>
+        </div>
+        <h3 class="ec-title fw-extrabold mb-1" style="font-size: 1.5rem;">Operational Command</h3>
+        <p class="text-muted small mb-0">{{ user.company_name }} Centralized Operations</p>
+        <span class="badge bg-dark rounded-pill px-3 py-1.5 ec-title mt-2" style="font-size: 0.8rem;">
+          {% if user.active_persona == "BUSINESS_OWNER" %}💼 Business Owner Mode{% else %}🛠️ IT Staff Console{% endif %}
+        </span>
+      </div>
+
+      <!-- Live Network Conduit Load Tracker -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <small class="text-uppercase fw-bold text-muted" style="font-size: 0.75rem;">Network Conduit Load</small>
+          <span class="fw-bold text-success ec-mono" id="conduit-load-text" style="color: var(--ec-secure) !important;">72%</span>
+        </div>
+        <div class="progress" style="height: 16px; border-radius: 10px; border: 2.5px solid var(--ec-charcoal); overflow: hidden; background-color: #e9ecef;">
+          <div id="conduit-load-bar" class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 72%; background-color: var(--ec-secure) !important;" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+
+      <!-- Live Security Anomalies Counter -->
+      <div class="p-3 mb-4 rounded-3 d-flex align-items-center justify-content-between" style="border: 2.5px solid var(--ec-charcoal); background-color: #fffdf0; box-shadow: 4px 4px 0px 0px var(--ec-charcoal);">
+        <div>
+          <small class="text-uppercase fw-bold text-muted d-block" style="font-size: 0.75rem; font-family: var(--ec-font-title);">Live Threat Blocks</small>
+          <span class="h1 fw-extrabold mb-0 ec-mono" id="live-anomaly-count">3582</span>
+        </div>
+        <div class="gem-icon" style="font-size: 2.5rem;">🛡️</div>
+      </div>
+
+      <!-- Sentry Drone Live Interaction Interface -->
+      <div class="mb-4 p-3 rounded-3 position-relative" style="border: 2.5px solid var(--ec-charcoal); background-color: #ffffff; box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.05);">
+        <div class="d-flex align-items-center mb-2">
+          <img src="{% static 'assets/mascot.png' %}" style="width: 45px; height: 45px; object-fit: contain; animation: droidHover 3s ease-in-out infinite;" class="me-2" alt="Sentry Assistant">
+          <h6 class="ec-title mb-0 ms-1" style="font-size: 1rem;">Sentry Droid Monitor</h6>
+        </div>
+        <div class="small text-muted" id="sentry-speech-text" style="font-size: 0.85rem; line-height: 1.45;">
+          Ready to launch operational maneuvers. Click the transit link below to enter our Campaign Districts and resolve active regulatory issues!
+        </div>
+      </div>
+
+      <!-- Primary State Machine Toggle Button -->
+      <button id="enter-campaign-btn" class="btn btn-ec-primary w-100 py-3 shadow-sm" style="font-size: 1.1rem; box-shadow: 4px 4px 0px 0px var(--ec-secure) !important;">
+        🗺️ Enter Campaign Districts
+      </button>
+      
+      <div class="text-center mt-3">
+        <a href="{% url 'gamification:select_persona' %}" class="btn btn-sm btn-ec-outline rounded-pill px-3 py-1.5" style="font-size: 0.8rem;">🔄 Switch Persona Mode</a>
+      </div>
+    </div>
+
+    <!-- RADAR SCANNER FEED -->
+    <div class="card ec-card p-4 shadow-lg mb-4" style="background-color: #ffffff !important;">
+      <h5 class="ec-title fw-extrabold mb-3 d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+        <span class="spinner-grow spinner-grow-sm text-success" role="status"></span> Active Radar Log Feed
+      </h5>
+      <div id="radar-activity-logs" class="p-3 rounded-3" style="border: 2.5px solid var(--ec-charcoal); background-color: #1a1c1e; min-height: 250px; max-height: 250px; overflow-y: hidden;">
+        <div class="mono-log-entry text-muted small py-1 border-bottom border-light text-truncate ec-mono">
+          <span class="text-success">[13:12:40]</span> Operational Command scanning active perimeter channels...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN: 8-SECTOR OPERATIONAL SYSTEMS GRID -->
+  <div class="col-xl-8 col-lg-7">
+    
+    <!-- SUB-HEADER AREA -->
+    <div class="mb-4">
+      <h1 class="ec-title mb-1 text-white" style="font-size: 2.5rem; text-shadow: 3px 3px 0px var(--ec-charcoal);">Operational Telemetry</h1>
+      <p class="text-white fw-bold" style="text-shadow: 1px 1px 2px var(--ec-charcoal);">
+        Track live systems. Click on system panels to drill down into active compliance nodes.
+      </p>
+    </div>
+
+    <!-- 8 SECTORS telemetry GRID -->
+    <div class="row g-4">
+      
+      <!-- SECTOR 1: AST (Asset Management) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w1_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="1" data-sector-name="Asset Management">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Clear Sector 1 Census Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🖥️ Physical & Cloud Grid</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Aligned</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Continuous monitoring of hardware infrastructure and sky-rise deployment endpoints.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Managed Terminals:</span>
+              <strong class="ec-mono text-dark">48 Active</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>IaaS Cloud Systems:</span>
+              <strong class="ec-mono text-dark">12 Clusters</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Registry Index:</span>
+              <strong class="ec-mono text-success">Verified (AST-01)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 2: IAC (Identity and Access) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w2_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="2" data-sector-name="Identity & Access">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Defeat Sector 2 Breach Simulator Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🆔 Access Citadel Portal</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">MFA Enforced</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Perimeter door logs and administrative credentials audit status.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Unauthenticated Access:</span>
+              <strong class="ec-mono text-success">0 Blocked</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Privileged Operators:</span>
+              <strong class="ec-mono text-dark">3 Monitored</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Password Vault Matrix:</span>
+              <strong class="ec-mono text-success">Compliant</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 3: END (Endpoint Security) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w3_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="3" data-sector-name="Endpoint Security">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Resolve Sector 3 Airship Attack Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🛡️ Endpoint Armor Canopy</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Shield Active</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Active EDR/AV security agent status reporting and software integrity checks.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Active Shield Coverage:</span>
+              <strong class="ec-mono text-success">100% Verified</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Patch Cycle Compliance:</span>
+              <strong class="ec-mono text-dark">SLA Compliant</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Administrative Privilege:</span>
+              <strong class="ec-mono text-success">Locked Down</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 4: DAT (Data Protection) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w4_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="4" data-sector-name="Data Protection">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Survive Sector 4 Data Heist Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">📦 Data Crypt Vault</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Encrypted</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Cryptographic core database encryption monitors and transit packet security.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>At-Rest Key Strength:</span>
+              <strong class="ec-mono text-dark">AES-256 GCM</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Transit Pipelines:</span>
+              <strong class="ec-mono text-success">TLS 1.3 Active</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Classification Records:</span>
+              <strong class="ec-mono text-success">Audit Clean</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 5: NET (Network Conduits) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w5_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="5" data-sector-name="Network Boundaries">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Overcome Sector 5 DDoS Storm Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🧪 Subterranean Pipelines</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Filtered</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Perimeter routing interfaces, firewall block logs, and guest SSID segregation stats.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Boundary Routing ACLs:</span>
+              <strong class="ec-mono text-success">Verified</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Guest Wi-Fi Isolation:</span>
+              <strong class="ec-mono text-success">Enforced</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Perimeter Defense state:</span>
+              <strong class="ec-mono text-success">Secure</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 6: GOV (Sentry Academy & Governance) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w6_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="6" data-sector-name="Governance">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Conquer Sector 6 Compliance Showdown Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🎓 Sentry Training Academy</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Educated</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Governance framework parameters, training rosters, and formal administrative directives.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Awareness Training:</span>
+              <strong class="ec-mono text-success">100% Roster Match</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Administrative Policies:</span>
+              <strong class="ec-mono text-dark">Fully Adopted</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Compliance Frameworks:</span>
+              <strong class="ec-mono text-success">SCF Mapped</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 7: MON (Watchtowers) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w7_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="7" data-sector-name="Continuous Monitoring">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Fulfill Sector 7 Log Dashboard Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">📡 Sentry Watchtowers</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">Collecting Logs</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Immutability auditing on system logging trails, SIEM sweeps, and radar vulnerabilities.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Audit Log Trails:</span>
+              <strong class="ec-mono text-success">Immutable Store</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Active Vuln Scanner:</span>
+              <strong class="ec-mono text-success">Operational</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>SIEM Ingestion Stream:</span>
+              <strong class="ec-mono text-success">Connected</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTOR 8: CRT (Continuity & Disaster Recovery Center) -->
+      <div class="col-md-6 col-12">
+        <div class="card ec-card p-4 position-relative" style="min-height: 240px;">
+          {% if not w8_boss_beaten %}
+            <div class="mystery-lock-overlay" data-sector-id="8" data-sector-name="Resilience Continuity">
+              <div class="mystery-block">?</div>
+              <h5 class="ec-title text-white small mb-0">Offline System Monitor</h5>
+              <p class="text-white-50 text-center px-3 mt-1" style="font-size: 0.75rem;">Survive Sector 8 Ransomware Boss to initialize tracking.</p>
+            </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="ec-title fw-extrabold mb-0" style="font-size: 1.15rem;">🧬 Disaster Recovery Capsules</h5>
+            <span class="badge-mushroom ec-title" style="font-size: 0.75rem;">RPO/RTO Met</span>
+          </div>
+          
+          <div class="border-top border-light pt-2">
+            <p class="text-muted small mb-3">Recovery time milestones, isolated offline capsule backups, and incident plan rosters.</p>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Recovery Objective (RTO):</span>
+              <strong class="ec-mono text-success">&lt; 4 Hours</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Recovery Point (RPO):</span>
+              <strong class="ec-mono text-success">&lt; 24 Hours</strong>
+            </div>
+            <div class="d-flex justify-content-between text-muted small">
+              <span>Isolated Vault Copy:</span>
+              <strong class="ec-mono text-success">Synchronized</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

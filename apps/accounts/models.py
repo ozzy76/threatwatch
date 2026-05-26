@@ -39,6 +39,21 @@ class User(Document):
     allowed_third_party_ids = fields.ListField(fields.ObjectIdField(), default=list)
     organization = fields.ReferenceField(Organization, null=True)
 
+    # Gamification Ledger State
+    current_progress_percentage = fields.IntField(default=0)
+    security_gems_balance = fields.IntField(default=0)
+    earned_badges = fields.ListField(fields.StringField(), default=list)
+    active_persona = fields.StringField(default="UNASSIGNED")
+    remediation_queue = fields.ListField(fields.StringField(), default=list)
+
+    # Gamification Onboarding & Survey answers
+    business_industry = fields.StringField(default="")
+    business_purpose = fields.StringField(default="")
+    business_structure = fields.StringField(default="")
+    locations = fields.ListField(fields.StringField(), default=list)
+    website_url = fields.StringField(default="")
+    node_completions = fields.DictField(default=dict)
+
     meta = {
         "collection": "accounts_user",
         "indexes": ["username", "email"],
@@ -72,6 +87,16 @@ class User(Document):
     @property
     def is_anonymous(self):
         return False
+
+    @property
+    def active_persona_display(self):
+        if not self.active_persona or self.active_persona == "UNASSIGNED":
+            return "Unassigned"
+        return self.active_persona.replace("_", " ").title()
+
+    @property
+    def remediation_tasks_display(self):
+        return [{"id": task, "display_name": task.replace("_", " ")} for task in (self.remediation_queue or [])]
 
     @property
     def effective_allowed_third_party_ids(self):

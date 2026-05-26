@@ -1,0 +1,1289 @@
+{% extends "base.html" %}
+{% block title %}Quest Node: {{ config.title }} - Security Quest{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      
+      <!-- Back button -->
+      <div class="mb-3">
+        <a href="{% url 'gamification:overworld' %}" class="text-decoration-none text-muted fw-bold">⬅️ Back to Overworld Map</a>
+      </div>
+
+      <div class="card p-4 p-md-5 shadow-lg border-0 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+          <div>
+            <span class="badge bg-success-light text-success-dark fw-bold mb-1">Quest Control: {{ node_id }}</span>
+            <h1 class="fw-extrabold text-black mb-0">{{ config.title }}</h1>
+          </div>
+          <div class="rewards-tag text-center p-2 rounded bg-light border border-warning" style="min-width: 80px;">
+            <div class="fs-4">💎</div>
+            <small class="fw-bold text-dark">+{{ config.rewards.gems }} Gems</small>
+          </div>
+        </div>
+
+        <form id="nodePlayForm" method="POST" action="{% url 'gamification:node_play' node_id %}">
+          {% csrf_token %}
+          <input type="hidden" name="answers" id="answers_json" value="">
+
+          <!-- DYNAMIC FORMS ACCORDING TO ROLE -->
+
+          <!-- ==========================================
+               WORLD 1: AST (Asset Management)
+               ========================================== -->
+
+          <!-- NODE W1_AST_01 -->
+          {% if node_id == "W1_AST_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Let's count the physical gear your team uses to get work done. Slide to estimate!</p>
+              <div class="form-group mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>💻 Company Laptops</span>
+                  <span id="val_laptops" class="fw-bold text-black">10</span>
+                </label>
+                <input type="range" class="form-range" min="0" max="100" value="10" oninput="updateRangeVal('laptops', this.value)">
+              </div>
+              <div class="form-group mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>🖥️ Desktop PCs</span>
+                  <span id="val_desktops" class="fw-bold text-black">5</span>
+                </label>
+                <input type="range" class="form-range" min="0" max="100" value="5" oninput="updateRangeVal('desktops', this.value)">
+              </div>
+              <div class="form-group mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>📱 Employee Personal Phones (BYOD)</span>
+                  <span id="val_phones" class="fw-bold text-black">8</span>
+                </label>
+                <input type="range" class="form-range" min="0" max="100" value="8" oninput="updateRangeVal('phones', this.value)">
+              </div>
+              <div class="form-group mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>🗄️ Office Servers</span>
+                  <span id="val_servers" class="fw-bold text-black">1</span>
+                </label>
+                <input type="range" class="form-range" min="0" max="10" value="1" oninput="updateRangeVal('servers', this.value)">
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Upload active directory, MDM inventory list, or asset tracking ledger to baseline controls:</p>
+              <div class="drag-drop-zone p-5 text-center border-2 border-dashed rounded-3 bg-light cursor-pointer" id="dropZone" onclick="triggerFileSelect()">
+                <div class="fs-1 mb-2">📁</div>
+                <h5 class="fw-bold text-black">Drag & Drop Asset Ledger Here</h5>
+                <p class="small text-muted">Accepted formats: .csv, .json (Auto-parses and aligns to AST controls)</p>
+                <input type="file" id="fileInput" class="d-none" accept=".csv,.json" onchange="simulateFileParse(this.files[0])">
+              </div>
+              <div id="uploadFeedback" class="mt-3 alert alert-success d-none border-0 small"></div>
+            {% endif %}
+
+          <!-- NODE W1_AST_02 -->
+          {% elif node_id == "W1_AST_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Where does your business live on the web? Select your active cloud outposts!</p>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <div class="card provider-logo-card p-3 d-flex align-items-center gap-3 cursor-pointer" onclick="toggleCloudOutpost('Google Workspace')" id="outpost_Google_Workspace">
+                    <span class="fs-2">💼</span>
+                    <h6 class="fw-bold mb-0">Google Workspace</h6>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="card provider-logo-card p-3 d-flex align-items-center gap-3 cursor-pointer" onclick="toggleCloudOutpost('Microsoft 365')" id="outpost_Microsoft_365">
+                    <span class="fs-2">📧</span>
+                    <h6 class="fw-bold mb-0">Microsoft 365</h6>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="card provider-logo-card p-3 d-flex align-items-center gap-3 cursor-pointer" onclick="toggleCloudOutpost('Dropbox')" id="outpost_Dropbox">
+                    <span class="fs-2">📦</span>
+                    <h6 class="fw-bold mb-0">Dropbox</h6>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="card provider-logo-card p-3 d-flex align-items-center gap-3 cursor-pointer" onclick="toggleCloudOutpost('AWS')" id="outpost_AWS">
+                    <span class="fs-2">☁️</span>
+                    <h6 class="fw-bold mb-0">Amazon Web Services (AWS)</h6>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Identify and verify deployed multi-tenant cloud architectures and IaaS configurations:</p>
+              <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                  <thead>
+                    <tr class="table-light">
+                      <th>Cloud Asset Type</th>
+                      <th>Verified & Active</th>
+                      <th>Needs Isolation Audit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-start fw-bold">SaaS Production Apps (OIDC linked)</td>
+                      <td><input type="checkbox" name="matrix_saas" value="active"></td>
+                      <td><input type="checkbox" name="matrix_saas" value="needs_audit"></td>
+                    </tr>
+                    <tr>
+                      <td class="text-start fw-bold">Cloud Storage Buckets (GCS/S3)</td>
+                      <td><input type="checkbox" name="matrix_buckets" value="active"></td>
+                      <td><input type="checkbox" name="matrix_buckets" value="needs_audit"></td>
+                    </tr>
+                    <tr>
+                      <td class="text-start fw-bold">VPC Compute Instances (AWS/GCP)</td>
+                      <td><input type="checkbox" name="matrix_vpc" value="active"></td>
+                      <td><input type="checkbox" name="matrix_vpc" value="needs_audit"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+
+          <!-- NODE W1_AST_03 -->
+          {% elif node_id == "W1_AST_03" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">What critical software tools keep the gears turning every day?</p>
+              <div class="form-group mb-4">
+                <label class="form-label" for="primary_os">Primary Platform</label>
+                <select class="form-select" id="primary_os" onchange="saveSelection('primary_os', this.value)">
+                  <option value="">Select Platform...</option>
+                  <option value="Windows Systems">Windows-based Systems</option>
+                  <option value="Apple macOS Platform">Apple macOS Platforms</option>
+                  <option value="Cloud/Browser-only tools">Cloud/Browser-only tools</option>
+                </select>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Enumerate critical software versions and internal operating system images for patch baselining:</p>
+              <div class="form-group mb-3">
+                <label class="form-label">Critical Systems Patch Baseline</label>
+                <input type="text" class="form-control mb-2" placeholder="e.g., macOS Sequoia Enterprise Build 15.1" id="baseline_1">
+                <input type="text" class="form-control mb-2" placeholder="e.g., Ubuntu 24.04 LTS Production Server image" id="baseline_2">
+                <input type="text" class="form-control" placeholder="e.g., Windows 11 Pro 23H2" id="baseline_3">
+              </div>
+            {% endif %}
+
+
+          <!-- ==========================================
+               WORLD 2: IAC (Identity & Access Control)
+               ========================================== -->
+
+          <!-- NODE W2_IAC_01 -->
+          {% elif node_id == "W2_IAC_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">When your team logs into work, does everyone have their own unique username, or does the team share logins for certain apps?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectBinaryOption('UNIQUE')" id="bin_UNIQUE">
+                    <div class="fs-1 mb-2">👥</div>
+                    <h5 class="fw-bold text-black mb-1">Unique Team Accounts</h5>
+                    <p class="small text-muted mb-0">Everyone logs in with their own email. Security and individual accountability is guaranteed.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectBinaryOption('SHARED')" id="bin_SHARED">
+                    <div class="fs-1 mb-2">🔑</div>
+                    <h5 class="fw-bold text-black mb-1">Shared Multi-User Logins</h5>
+                    <p class="small text-muted mb-0">The team shares a single 'master' login for certain apps. (Requires remediation!)</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Enforce individual accountability criteria. Confirm structural configuration patterns across directories:</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="upn_tracking" name="toggle_it">
+                <label class="form-check-label fw-bold" for="upn_tracking">Enforced individual UPN tracking</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="no_shared_admins" name="toggle_it">
+                <label class="form-check-label fw-bold" for="no_shared_admins">Eliminated active generic shared domain administrative accounts</label>
+              </div>
+            {% endif %}
+
+          <!-- NODE W2_IAC_02 -->
+          {% elif node_id == "W2_IAC_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">When logging into your core systems (like email or banking), do you require a second step—like a mobile app code—after typing the password?</p>
+              <div class="list-group gap-2">
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectMfaBranch('COMPLIANT')" id="mfa_COMPLIANT">
+                  <h5 class="fw-bold mb-1">Yes, everywhere!</h5>
+                  <p class="small text-muted mb-0">Every core tool is locked down with MFA codes or hardware security keys.</p>
+                </div>
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectMfaBranch('PARTIAL')" id="mfa_PARTIAL">
+                  <h5 class="fw-bold mb-1">Only for some things.</h5>
+                  <p class="small text-muted mb-0">Some of our financial tools or core emails have MFA, but not all team tools.</p>
+                </div>
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectMfaBranch('EXPLAIN')" id="mfa_EXPLAIN">
+                  <h5 class="fw-bold mb-1">What is Multi-Factor Authentication (MFA)?</h5>
+                  <p class="small text-muted mb-0">Explain to me how this protects my business from credential stuffing!</p>
+                </div>
+              </div>
+              
+              <!-- Custom Info Popover Explainer -->
+              <div id="mfaExplainerBox" class="mt-4 p-4 border rounded-3 bg-light d-none">
+                <h5 class="fw-bold mb-2">💡 MFA: The Absolute Shield</h5>
+                <p class="small text-muted mb-0">Imagine a burglar steals your door keys (your password). If you have a deadbolt that needs a code sent to your mobile phone (MFA), the burglar still can't get in! Enabling MFA blocks over 99.9% of automated account takeover attacks.</p>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Audit and verify active Multi-Factor Authentication enforcement policies across corporate architecture environments:</p>
+              <div class="table-responsive">
+                <table class="table table-striped table-bordered text-center">
+                  <thead>
+                    <tr>
+                      <th class="text-start">Identity Session Channels</th>
+                      <th>MFA Enforced Globally</th>
+                      <th>SMS/Voice Allowed</th>
+                      <th>No MFA Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-start fw-bold">Administrative Channels</td>
+                      <td><input type="radio" name="mfa_admin" value="global" checked></td>
+                      <td><input type="radio" name="mfa_admin" value="sms"></td>
+                      <td><input type="radio" name="mfa_admin" value="none"></td>
+                    </tr>
+                    <tr>
+                      <td class="text-start fw-bold">Remote/VPN Access</td>
+                      <td><input type="radio" name="mfa_vpn" value="global"></td>
+                      <td><input type="radio" name="mfa_vpn" value="sms" checked></td>
+                      <td><input type="radio" name="mfa_vpn" value="none"></td>
+                    </tr>
+                    <tr>
+                      <td class="text-start fw-bold">Standard End-User Identity Sessions</td>
+                      <td><input type="radio" name="mfa_user" value="global"></td>
+                      <td><input type="radio" name="mfa_user" value="sms"></td>
+                      <td><input type="radio" name="mfa_user" value="none" checked></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+
+          <!-- NODE W2_IAC_03 -->
+          {% elif node_id == "W2_IAC_03" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Where does your team keep their passwords? Be honest, we won't tell anyone!</p>
+              <div class="list-group gap-2">
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectPasswordMethod('STICKY', 0)" id="pwd_STICKY">
+                  <span class="fs-3 d-block mb-1">📝</span>
+                  <h6 class="fw-bold mb-1">Written down on sticky notes or in a notebook.</h6>
+                </div>
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectPasswordMethod('EXCEL', 1)" id="pwd_EXCEL">
+                  <span class="fs-3 d-block mb-1">📊</span>
+                  <h6 class="fw-bold mb-1">In an Excel sheet or saved in browser auto-fill.</h6>
+                </div>
+                <div class="list-group-item list-group-item-action cursor-pointer rounded border-2 p-3" onclick="selectPasswordMethod('MANAGER', 3)" id="pwd_MANAGER">
+                  <span class="fs-3 d-block mb-1">🔐</span>
+                  <h6 class="fw-bold mb-1">We use a dedicated Password Manager (1Password, Bitwarden, etc.).</h6>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Specify configuration requirements for centralized enterprise identity password strength parameters:</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" for="min_length">Min Length</label>
+                  <input type="number" class="form-control" id="min_length" value="12">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="rotation_days">Rotation Cycle (Days)</label>
+                  <input type="number" class="form-control" id="rotation_days" value="90">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="complexity">Complexity Pattern</label>
+                  <select class="form-select" id="complexity">
+                    <option value="alphanumeric">Alphanumeric</option>
+                    <option value="complex_chars" selected>Special Chars & Symbols</option>
+                  </select>
+                </div>
+              </div>
+            {% endif %}
+
+          <!-- NODE W3_END_01 -->
+          {% elif node_id == "W3_END_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">How do you protect your team's laptops and workstations from rogue malware scouts?</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="toggleW3End01('AV')" id="w3_av">
+                    <div class="fs-1 mb-2">🛡️</div>
+                    <h5 class="fw-bold text-black mb-1">Standard Antivirus</h5>
+                    <p class="small text-muted mb-0">Runs basic scans for known malware signatures.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="toggleW3End01('EDR')" id="w3_edr">
+                    <div class="fs-1 mb-2">🚀</div>
+                    <h5 class="fw-bold text-black mb-1">Advanced EDR</h5>
+                    <p class="small text-muted mb-0">Monitors behavior in real-time to deflect zero-day attacks (Compliant!).</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="toggleW3End01('FIREWALL')" id="w3_fw">
+                    <div class="fs-1 mb-2">🔥</div>
+                    <h5 class="fw-bold text-black mb-1">Local Firewall</h5>
+                    <p class="small text-muted mb-0">Blocks unauthorized network connections.</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Configure corporate Endpoint Detection & Response (EDR) policy properties:</p>
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label" for="edr_provider">EDR Provider Platform</label>
+                  <select class="form-select" id="edr_provider" onchange="updateITStaffEDR()">
+                    <option value="">Select Platform...</option>
+                    <option value="CrowdStrike Falcon">CrowdStrike Falcon Enterprise</option>
+                    <option value="SentinelOne">SentinelOne Singularity</option>
+                    <option value="Microsoft Defender">Microsoft Defender for Endpoint</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="edr_agent_version">Agent Build Version</label>
+                  <input type="text" class="form-control" id="edr_agent_version" placeholder="e.g., v24.2.1-stable" oninput="updateITStaffEDR()">
+                </div>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="edr_realtime_block" name="toggle_it">
+                <label class="form-check-label fw-bold" for="edr_realtime_block">Enforce real-time behavioral block-mode engine</label>
+              </div>
+            {% endif %}
+
+          <!-- NODE W3_END_02 -->
+          {% elif node_id == "W3_END_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">How quickly does your kingdom patch vulnerability holes when vendor updates are released?</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectPatchSLA('slow_turtle')" id="sla_slow">
+                    <div class="fs-1 mb-2">🐢</div>
+                    <h5 class="fw-bold text-black mb-1">Snail Pace Card</h5>
+                    <p class="small text-muted mb-0">We update when we find time or the machine forces a reboot.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectPatchSLA('standard')" id="sla_std">
+                    <div class="fs-1 mb-2">⚡</div>
+                    <h5 class="fw-bold text-black mb-1">Swift Shield Card</h5>
+                    <p class="small text-muted mb-0">We apply updates on a monthly schedule within 30 days.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectPatchSLA('fast_remediation')" id="sla_fast">
+                    <div class="fs-1 mb-2">🌟</div>
+                    <h5 class="fw-bold text-black mb-1">Super Star Patch Card</h5>
+                    <p class="small text-muted mb-0">Auto-update turned on. Patched immediately under 14 days (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Set operational vulnerability remediation thresholds SLA (Days):</p>
+              <div class="mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Critical Vulnerabilities (SLA Days)</span>
+                  <span id="val_critical_sla" class="fw-bold text-danger">30 Days</span>
+                </label>
+                <input type="range" class="form-range" min="1" max="90" value="30" id="critical_sla_range" oninput="updateSlaRange('critical_sla', this.value)">
+              </div>
+              <div class="mb-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>High Vulnerabilities (SLA Days)</span>
+                  <span id="val_high_sla" class="fw-bold text-warning">30 Days</span>
+                </label>
+                <input type="range" class="form-range" min="1" max="90" value="30" id="high_sla_range" oninput="updateSlaRange('high_sla', this.value)">
+              </div>
+            {% endif %}
+
+          <!-- NODE W3_END_03 -->
+          {% elif node_id == "W3_END_03" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Who holds the crown keys (Local Administrator rights) on standard laptops?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectAdminRights('unrestricted')" id="adm_unrestricted">
+                    <div class="fs-1 mb-2">👑</div>
+                    <h5 class="fw-bold text-black mb-1">Crown of Absolute Power</h5>
+                    <p class="small text-muted mb-0">Everyone is an administrator. Convenient, but any rogue malware inherits absolute rights.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectAdminRights('standard')" id="adm_standard">
+                    <div class="fs-1 mb-2">🛡️</div>
+                    <h5 class="fw-bold text-black mb-1">Shield of Guided Duty</h5>
+                    <p class="small text-muted mb-0">Standard user accounts by default. Admin access only when authorized (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Validate system privileges alignment against Least Privilege objectives:</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="no_local_admin" name="toggle_it">
+                <label class="form-check-label fw-bold" for="no_local_admin">Revoked local administrator privileges from standard users</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="justified_escalation" name="toggle_it">
+                <label class="form-check-label fw-bold" for="justified_escalation">Mandatory MFA and ticket approval for temporary elevation</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="usb_autorun_disabled" name="toggle_it">
+                <label class="form-check-label fw-bold" for="usb_autorun_disabled">Peripheral auto-run and USB mass storage blocked via GPO/MDM</label>
+              </div>
+            {% endif %}
+
+          <!-- NODE W4_DAT_01 -->
+          {% elif node_id == "W4_DAT_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Click and sort your business files to put them in the correct secure storage vault!</p>
+              
+              <div class="p-3 bg-light rounded border mb-4">
+                <h6 class="fw-bold text-black mb-2">Active Document Queue (Click to select, then click target chest):</h6>
+                <div class="d-flex flex-wrap gap-2 justify-content-center" id="sortingQueue">
+                  <span class="badge bg-secondary p-2 cursor-pointer border fs-6" id="sort_card" onclick="selectSortItem('sort_card', 'CONFIDENTIAL')">💳 Customer Credit Card details</span>
+                  <span class="badge bg-secondary p-2 cursor-pointer border fs-6" id="sort_code" onclick="selectSortItem('sort_code', 'INTERNAL')">💻 Internal Source Code files</span>
+                  <span class="badge bg-secondary p-2 cursor-pointer border fs-6" id="sort_pitch" onclick="selectSortItem('sort_pitch', 'PUBLIC')">📢 Public Marketing Pitch Deck</span>
+                </div>
+              </div>
+
+              <div class="row g-3 text-center">
+                <div class="col-md-4">
+                  <div class="card p-3 border-2" id="chest_public" onclick="placeSortedItem('PUBLIC')">
+                    <span class="fs-1">🌲</span>
+                    <h5 class="fw-bold text-black mt-2">Public Forest</h5>
+                    <p class="small text-muted mb-2">Accessible to anyone on the web.</p>
+                    <div id="placed_PUBLIC" class="small fw-bold text-success"></div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card p-3 border-2" id="chest_internal" onclick="placeSortedItem('INTERNAL')">
+                    <span class="fs-1">🏰</span>
+                    <h5 class="fw-bold text-black mt-2">Internal Castle</h5>
+                    <p class="small text-muted mb-2">Restricted to your company employees.</p>
+                    <div id="placed_INTERNAL" class="small fw-bold text-success"></div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card p-3 border-2" id="chest_confidential" onclick="placeSortedItem('CONFIDENTIAL')">
+                    <span class="fs-1">💎</span>
+                    <h5 class="fw-bold text-black mt-2">Secure Gold Vault</h5>
+                    <p class="small text-muted mb-2">Ultra-encrypted, highly isolated storage.</p>
+                    <div id="placed_CONFIDENTIAL" class="small fw-bold text-success"></div>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Define classification schemas and compliance mappings for core corporate datastores:</p>
+              <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center">
+                  <thead>
+                    <tr class="table-light">
+                      <th>Datastore Name</th>
+                      <th>Classification Level</th>
+                      <th>Owner Role</th>
+                      <th>Retention (Years)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-start fw-bold">production_customer_ledger_db</td>
+                      <td>
+                        <select class="form-select form-select-sm" id="class_cust" onchange="updateClassificationMatrix()">
+                          <option value="CONFIDENTIAL" selected>Confidential (Private)</option>
+                          <option value="INTERNAL">Internal Use</option>
+                        </select>
+                      </td>
+                      <td><input type="text" class="form-control form-control-sm" value="Data Protection Officer" id="owner_cust" oninput="updateClassificationMatrix()"></td>
+                      <td><input type="number" class="form-control form-control-sm" value="7" id="ret_cust" oninput="updateClassificationMatrix()"></td>
+                    </tr>
+                    <tr>
+                      <td class="text-start fw-bold">employee_records_vault_s3</td>
+                      <td>
+                        <select class="form-select form-select-sm" id="class_emp" onchange="updateClassificationMatrix()">
+                          <option value="CONFIDENTIAL" selected>Confidential (Private)</option>
+                          <option value="INTERNAL">Internal Use</option>
+                        </select>
+                      </td>
+                      <td><input type="text" class="form-control form-control-sm" value="HR Director" id="owner_emp" oninput="updateClassificationMatrix()"></td>
+                      <td><input type="number" class="form-control form-control-sm" value="5" id="ret_emp" oninput="updateClassificationMatrix()"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+
+          <!-- NODE W4_DAT_02 -->
+          {% elif node_id == "W4_DAT_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">What kind of lock should protect your secure datastores at rest inside the database vault?</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectVaultLock('REST_PLAINTEXT')" id="lock_plain">
+                    <div class="fs-1 mb-2">🔓</div>
+                    <h5 class="fw-bold text-black mb-1">Rusty Brass Latch</h5>
+                    <p class="small text-muted mb-0">No encryption at rest. If storage is leaked or stolen, files are exposed immediately.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectVaultLock('REST_STANDARD')" id="lock_std">
+                    <div class="fs-1 mb-2">🔒</div>
+                    <h5 class="fw-bold text-black mb-1">Combination Padlock</h5>
+                    <p class="small text-muted mb-0">Basic disk encryption. Standard access checks are needed.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectVaultLock('REST_ENCRYPTED')" id="lock_secure">
+                    <div class="fs-1 mb-2">💎</div>
+                    <h5 class="fw-bold text-black mb-1">Rune-Carved Obsidian Key</h5>
+                    <p class="small text-muted mb-0">AES-256 military-grade encryption with master KMS keys (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Verify cryptographic compliance parameters for databases and backups at rest:</p>
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <label class="form-label" for="crypto_alg">Encryption Algorithm</label>
+                  <select class="form-select" id="crypto_alg" onchange="updateITStaffCrypto()">
+                    <option value="">Select Algorithm...</option>
+                    <option value="AES_256_GCM">AES-256-GCM (Recommended)</option>
+                    <option value="AES_128_CBC">AES-128-CBC</option>
+                    <option value="NONE">None</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="kms_provider">Key Management Service (KMS)</label>
+                  <select class="form-select" id="kms_provider" onchange="updateITStaffCrypto()">
+                    <option value="">Select Provider...</option>
+                    <option value="AWS_KMS">AWS KMS</option>
+                    <option value="GCP_KMS">Google Cloud KMS</option>
+                    <option value="HASHICORP_VAULT">HashiCorp Vault</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="key_rotation_cycle">KMS Key Rotation Cycle (Days)</label>
+                  <input type="number" class="form-control" id="key_rotation_cycle" value="90" oninput="updateITStaffCrypto()">
+                </div>
+              </div>
+            {% endif %}
+
+          <!-- NODE W4_DAT_03 -->
+          {% elif node_id == "W4_DAT_03" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">How do you protect your data when it is in transit being transported by couriers?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectTransitCarrier('false')" id="carrier_unsecure">
+                    <div class="fs-1 mb-2">🕊️</div>
+                    <h5 class="fw-bold text-black mb-1">Cleartext Carrier Pigeon</h5>
+                    <p class="small text-muted mb-0">Unencrypted transmission. Intruders along the route can read and steal records easily.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="selectTransitCarrier('true')" id="carrier_secure">
+                    <div class="fs-1 mb-2">🏇</div>
+                    <h5 class="fw-bold text-black mb-1">Enchanted Shielded Envoy</h5>
+                    <p class="small text-muted mb-0">Full SSL/TLS encrypted transit tunnel. Highly secure and tamper-proof (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Verify TLS and Cipher Suite compliance for data in transit:</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enforce_tls_1_3" name="toggle_it">
+                <label class="form-check-label fw-bold" for="enforce_tls_1_3">Enforce TLS 1.3 only, disabling legacy protocol versions</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enforce_hsts" name="toggle_it">
+                <label class="form-check-label fw-bold" for="enforce_hsts">Configure strict HSTS header policy with 31536000 duration</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enforce_forward_secrecy" name="toggle_it">
+                <label class="form-check-label fw-bold" for="enforce_forward_secrecy">Restrict ciphers to ECDHE-based forward secrecy suites</label>
+              </div>
+            {% endif %}
+
+          <!-- ==========================================
+               WORLD 5: NET (Network Boundaries)
+               ========================================== -->
+
+          <!-- NODE W5_NET_01 -->
+          {% elif node_id == "W5_NET_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Does your office infrastructure feature an isolated firewall boundary configuration protecting city terminals from perimeter tracking?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('boundary_defense', 'unfiltered'); saveSelection('firewall_status', 'FIREWALL_NONE');" id="boundary_unfiltered">
+                    <div class="fs-1 mb-2">🔓</div>
+                    <h5 class="fw-bold text-black mb-1">Unfiltered Open Gateway</h5>
+                    <p class="small text-muted mb-0">No network segmentation or boundaries. Inbound traffic moves directly to internal workstations.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('boundary_defense', 'shielded'); saveSelection('firewall_status', 'FIREWALL_COMPLIANT');" id="boundary_shielded">
+                    <div class="fs-1 mb-2">⚡</div>
+                    <h5 class="fw-bold text-black mb-1">Shielded Castle Perimeter</h5>
+                    <p class="small text-muted mb-0">Automated firewall filtering blocks malicious probes on system gates (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const u = document.getElementById('boundary_unfiltered');
+                  const s = document.getElementById('boundary_shielded');
+                  u.addEventListener('click', () => { u.classList.add('selected'); s.classList.remove('selected'); });
+                  s.addEventListener('click', () => { s.classList.add('selected'); u.classList.remove('selected'); });
+                });
+              </script>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Verify network boundary architecture and perimeter access control lists (ACLs):</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enforce_perimeter_firewall" name="toggle_it">
+                <label class="form-check-label fw-bold" for="enforce_perimeter_firewall">Enforce default-deny rule policy on external perimeter gateway firewalls</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="ingress_egress_filtering" name="toggle_it">
+                <label class="form-check-label fw-bold" for="ingress_egress_filtering">Enable stateful ingress & egress packet filtering checks (NET-01)</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="block_legacy_management" name="toggle_it">
+                <label class="form-check-label fw-bold" for="block_legacy_management">Disable legacy unencrypted remote protocols (e.g. Telnet, HTTP) across boundaries</label>
+              </div>
+            {% endif %}
+
+          <!-- NODE W5_NET_02 -->
+          {% elif node_id == "W5_NET_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">When unverified guests access office Wi-Fi arrays, are they routed into the same channel containing core internal systems?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('wifi_segregation', 'unified'); saveSelection('wifi_status', 'open_bridge');" id="wifi_unified">
+                    <div class="fs-1 mb-2">📻</div>
+                    <h5 class="fw-bold text-black mb-1">Unified Open Access Channel</h5>
+                    <p class="small text-muted mb-0">Single shared network password. Guests and financial systems run inside the exact same wireless field.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('wifi_segregation', 'segregated'); saveSelection('wifi_status', 'segmented_secure');" id="wifi_segregated">
+                    <div class="fs-1 mb-2">📶</div>
+                    <h5 class="fw-bold text-black mb-1">Dual-Band Segregated Array</h5>
+                    <p class="small text-muted mb-0">Separate guest-only network access path. Core system assets reside behind shielded SSIDs (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const u = document.getElementById('wifi_unified');
+                  const s = document.getElementById('wifi_segregated');
+                  u.addEventListener('click', () => { u.classList.add('selected'); s.classList.remove('selected'); });
+                  s.addEventListener('click', () => { s.classList.add('selected'); u.classList.remove('selected'); });
+                });
+              </script>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Audit organizational wireless access configuration parameters (SCF WLS-01):</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enforce_wpa3" name="toggle_it">
+                <label class="form-check-label fw-bold" for="enforce_wpa3">Enforce WPA3 enterprise-grade encryption profiles on all corporate SSIDs</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="isolate_guest_vlan" name="toggle_it">
+                <label class="form-check-label fw-bold" for="isolate_guest_vlan">Configure guest SSID to route directly to outside carrier with VLAN isolation enabled</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="periodic_wifi_sweep" name="toggle_it">
+                <label class="form-check-label fw-bold" for="periodic_wifi_sweep">Establish automated rogue wireless access sweep schedules</label>
+              </div>
+            {% endif %}
+
+          <!-- ==========================================
+               WORLD 6: GOV (Governance)
+               ========================================== -->
+
+          <!-- NODE W6_SAT_01 -->
+          {% elif node_id == "W6_SAT_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Assign safety awareness training courses to active personnel to complete the Sentry Academy program:</p>
+              <div class="row g-3">
+                <div class="col-sm-4">
+                  <div class="card p-3 text-center border cursor-pointer" id="sat_course_1" onclick="this.classList.toggle('selected'); saveSelection('sat_phishing', 'assigned');">
+                    <span class="fs-1 mb-2">🎯</span>
+                    <h6 class="fw-bold mb-1">Anti-Phishing Shielding</h6>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Trains staff to catch spoofed messages.</small>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card p-3 text-center border cursor-pointer" id="sat_course_2" onclick="this.classList.toggle('selected'); saveSelection('sat_pwd', 'assigned');">
+                    <span class="fs-1 mb-2">🔑</span>
+                    <h6 class="fw-bold mb-1">Password Fortress Tactics</h6>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Trains staff on password managers and MFA.</small>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card p-3 text-center border cursor-pointer" id="sat_course_3" onclick="this.classList.toggle('selected'); saveSelection('sat_social', 'assigned');">
+                    <span class="fs-1 mb-2">🗣️</span>
+                    <h6 class="fw-bold mb-1">Social Engineering Armor</h6>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">Shields team from spoofed corporate calls.</small>
+                  </div>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Upload verification parameters for annual security awareness and training compliance criteria (SCF SAT-01):</p>
+              <div class="drag-drop-zone p-5 text-center border-2 border-dashed rounded-3 bg-light cursor-pointer" id="dropZone" onclick="triggerFileSelect()">
+                <div class="fs-1 mb-2">📁</div>
+                <h5 class="fw-bold text-black">Drag & Drop Training Roster Here</h5>
+                <p class="small text-muted">Accepted formats: .csv, .json (Verifies staff training status and maps to SAT-03)</p>
+                <input type="file" id="fileInput" class="d-none" accept=".csv,.json" onchange="simulateFileParse(this.files[0])">
+              </div>
+              <div id="uploadFeedback" class="mt-3 alert alert-success d-none border-0 small"></div>
+            {% endif %}
+
+          <!-- NODE W6_GOV_02 -->
+          {% elif node_id == "W6_GOV_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Adopt pre-mapped administrative policy decrees pre-customized for current regional standards:</p>
+              <div class="card p-4 border rounded-3 text-center">
+                <span class="fs-1 mb-2">📜</span>
+                <h5 class="fw-bold text-black">Information Security Policy Declaration</h5>
+                <p class="text-muted small">Establishes key guidelines regarding access paths, encryption targets, and continuous asset monitoring protocols.</p>
+                <div class="form-check d-inline-block text-start mx-auto mt-3">
+                  <input class="form-check-input" type="checkbox" id="sign_policy" onclick="saveSelection('policy_signed', 'true')">
+                  <label class="form-check-label fw-bold" for="sign_policy">I formalize, sign, and adopt the administrative policy decree.</label>
+                </div>
+              </div>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Map internal control policies to required corporate governance frameworks:</p>
+              <div class="form-group mb-3">
+                <label class="form-label fw-bold">Select Active Governance Framework Targets</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="fw_nist" checked name="toggle_it">
+                  <label class="form-check-label" for="fw_nist">NIST CSF (Critical Infrastructure Cybersecurity Framework)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="fw_iso" checked name="toggle_it">
+                  <label class="form-check-label" for="fw_iso">ISO/IEC 27001 (Information Security Management)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="fw_soc2" checked name="toggle_it">
+                  <label class="form-check-label" for="fw_soc2">SOC 2 Type II (Security, Availability, and Confidentiality Controls)</label>
+                </div>
+              </div>
+            {% endif %}
+
+          <!-- ==========================================
+               WORLD 7: MON (Continuous Monitoring)
+               ========================================== -->
+
+          <!-- NODE W7_VPM_01 -->
+          {% elif node_id == "W7_VPM_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Deploy automated radar systems to monitor infrastructure boundaries for potential systemic weaknesses:</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card p-3 text-center border cursor-pointer" id="scan_weekly" onclick="saveSelection('scan_schedule', 'weekly'); selectScanSched('weekly');">
+                    <span class="fs-1 mb-2">🗓️</span>
+                    <h5 class="fw-bold text-black mb-1">Weekly Auto-Scan</h5>
+                    <p class="small text-muted mb-0">Runs automated scan probes every Sunday to verify asset security perimeter.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card p-3 text-center border cursor-pointer" id="scan_monthly" onclick="saveSelection('scan_schedule', 'monthly'); selectScanSched('monthly');">
+                    <span class="fs-1 mb-2">📅</span>
+                    <h5 class="fw-bold text-black mb-1">Monthly Auto-Scan</h5>
+                    <p class="small text-muted mb-0">Runs comprehensive scans monthly. Lower resource impact, slightly longer detection delays.</p>
+                  </div>
+                </div>
+              </div>
+              <script>
+                function selectScanSched(s) {
+                  const w = document.getElementById('scan_weekly');
+                  const m = document.getElementById('scan_monthly');
+                  if (s === 'weekly') { w.classList.add('selected'); m.classList.remove('selected'); }
+                  else { m.classList.add('selected'); w.classList.remove('selected'); }
+                }
+              </script>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Configure scan configurations and scheduling parameters for automated perimeter vulnerability assessments:</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="scan_target_ip">Target Domain Scan Host</label>
+                  <input type="text" class="form-control" id="scan_target_ip" value="https://{{ user.website_url|default:'localhost' }}" oninput="saveSelection('scan_target', this.value)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="scan_cron">Cron Trigger Schedule Expression</label>
+                  <input type="text" class="form-control" id="scan_cron" value="0 0 * * 0" oninput="saveSelection('scan_cron', this.value)">
+                </div>
+              </div>
+            {% endif %}
+
+          <!-- NODE W7_MON_02 -->
+          {% elif node_id == "W7_MON_02" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">Are system access paths recording transactional trails to identify structural entry events?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('logging_trail', 'paper'); saveSelection('logbook_status', 'LOGBOOK_NONE');" id="log_paper">
+                    <div class="fs-1 mb-2">📓</div>
+                    <h5 class="fw-bold text-black mb-1">Plain Paper Logbook</h5>
+                    <p class="small text-muted mb-0">Activity is written to raw local console text logs. Susceptible to intrusion alterations.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('logging_trail', 'vault'); saveSelection('logbook_status', 'immutable_vault');" id="log_vault">
+                    <div class="fs-1 mb-2">📔</div>
+                    <h5 class="fw-bold text-black mb-1">Indestructible Ledger Vault</h5>
+                    <p class="small text-muted mb-0">Central Syslog feed inside immutable, write-once storage compartments (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const p = document.getElementById('log_paper');
+                  const v = document.getElementById('log_vault');
+                  p.addEventListener('click', () => { p.classList.add('selected'); v.classList.remove('selected'); });
+                  v.addEventListener('click', () => { v.classList.add('selected'); p.classList.remove('selected'); });
+                });
+              </script>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Verify ingestion architecture and immutability tracking of structural infrastructure logging trails (SCF A&A-02):</p>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="central_syslog_ingest" name="toggle_it">
+                <label class="form-check-label fw-bold" for="central_syslog_ingest">Incorporate central syslog forwarding on all core active infrastructure</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="immutable_audit_logs" name="toggle_it">
+                <label class="form-check-label fw-bold" for="immutable_audit_logs">Configure storage buckets for WORM (Write-Once-Read-Many) log immutability</label>
+              </div>
+            {% endif %}
+
+          <!-- ==========================================
+               WORLD 8: CRT (Resilience Continuity)
+               ========================================== -->
+
+          <!-- NODE W8_DRP_01 -->
+          {% elif node_id == "W8_DRP_01" %}
+            {% if active_persona == "BUSINESS_OWNER" %}
+              <p class="lead text-muted mb-4">If an operational catastrophe system crash compromises the city grid, do isolated external recovery copies exist to rebuild infrastructure?</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('backup_resilience', 'local'); saveSelection('backup_status', 'BACKUP_NONE');" id="backup_local">
+                    <div class="fs-1 mb-2">💾</div>
+                    <h5 class="fw-bold text-black mb-1">Local Terminal Backups Only</h5>
+                    <p class="small text-muted mb-0">Backups sit on local disks. Ransomware targeting nodes can infect recovery blocks easily.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card binary-visual-card text-center p-4 cursor-pointer" onclick="saveSelection('backup_resilience', 'capsule'); saveSelection('backup_status', 'isolated_capsule');" id="backup_capsule">
+                    <div class="fs-1 mb-2">🧬</div>
+                    <h5 class="fw-bold text-black mb-1">Isolated Backup Capsules</h5>
+                    <p class="small text-muted mb-0">Replicated snapshots stored in completely air-gapped recovery vaults (Compliant!).</p>
+                  </div>
+                </div>
+              </div>
+              <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                  const l = document.getElementById('backup_local');
+                  const c = document.getElementById('backup_capsule');
+                  l.addEventListener('click', () => { l.classList.add('selected'); c.classList.remove('selected'); });
+                  c.addEventListener('click', () => { c.classList.add('selected'); l.classList.remove('selected'); });
+                });
+              </script>
+            {% else %}
+              <!-- IT STAFF -->
+              <p class="lead text-muted mb-4">Define organizational Recovery Point Objectives (RPO) and Recovery Time Objectives (RTO):</p>
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label d-flex justify-content-between">
+                    <span>Target Recovery Point Objective (RPO)</span>
+                    <span id="val_rpo_display" class="fw-bold text-success ec-mono">24 Hours</span>
+                  </label>
+                  <input type="range" class="form-range" min="1" max="168" value="24" oninput="document.getElementById('val_rpo_display').innerText = this.value + ' Hours'; saveSelection('rpo_target', this.value);">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label d-flex justify-content-between">
+                    <span>Target Recovery Time Objective (RTO)</span>
+                    <span id="val_rto_display" class="fw-bold text-success ec-mono">4 Hours</span>
+                  </label>
+                  <input type="range" class="form-range" min="1" max="168" value="4" oninput="document.getElementById('val_rto_display').innerText = this.value + ' Hours'; saveSelection('rto_target', this.value);">
+                </div>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="backup_encryption" name="toggle_it">
+                <label class="form-check-label fw-bold" for="backup_encryption">Cryptographically scramble backup snapshots using AES-256 (BCP-02)</label>
+              </div>
+            {% endif %}
+
+          {% endif %}
+
+          <div class="mt-5 text-center">
+            <button type="submit" class="btn btn-dark rounded-pill px-5 btn-lg shadow" onclick="compileAnswersBeforeSubmit(event)">Complete Quest & Claim Rewards</button>
+          </div>
+
+        </form>
+      </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .cursor-pointer { cursor: pointer; }
+  .provider-logo-card, .binary-visual-card {
+    border-color: var(--bi-border-color) !important;
+    background-color: var(--bi-card-bg) !important;
+    transition: all 0.25s ease !important;
+  }
+  .provider-logo-card:hover, .binary-visual-card:hover {
+    transform: translateY(-3px) !important;
+    border-color: var(--bi-accent-black) !important;
+  }
+  .provider-logo-card.selected, .binary-visual-card.selected {
+    border-color: var(--bi-accent-green) !important;
+    background-color: #fcfdf5 !important;
+    box-shadow: 0 4px 15px rgba(164, 208, 55, 0.15) !important;
+  }
+
+  .drag-drop-zone {
+    border-color: #cbd5e1 !important;
+    transition: all 0.2s ease;
+  }
+  .drag-drop-zone:hover {
+    border-color: var(--bi-accent-black) !important;
+    background-color: #f8fafc !important;
+  }
+</style>
+
+<script>
+  let answersObj = {};
+
+  function updateRangeVal(key, val) {
+    document.getElementById('val_' + key).innerText = val;
+    answersObj[key] = val;
+  }
+
+  // --- World 1 Node 2: Cloud Outposts ---
+  let selectedOutposts = [];
+  function toggleCloudOutpost(provider) {
+    const card = document.getElementById('outpost_' + provider.replace(/ /g, '_'));
+    if (selectedOutposts.includes(provider)) {
+      selectedOutposts = selectedOutposts.filter(p => p !== provider);
+      card.classList.remove('selected');
+    } else {
+      selectedOutposts.push(provider);
+      card.classList.add('selected');
+    }
+    answersObj['cloud_outposts'] = selectedOutposts;
+  }
+
+  // --- World 2 Node 1: Unique accounts vs Shared ---
+  function selectBinaryOption(option) {
+    document.getElementById('bin_UNIQUE').classList.remove('selected');
+    document.getElementById('bin_SHARED').classList.remove('selected');
+    document.getElementById('bin_' + option).classList.add('selected');
+    answersObj['account_type'] = option;
+  }
+
+  // --- World 2 Node 2: MFA Card branches ---
+  function selectMfaBranch(branch) {
+    document.getElementById('mfa_COMPLIANT').classList.remove('active', 'list-group-item-success');
+    document.getElementById('mfa_PARTIAL').classList.remove('active', 'list-group-item-warning');
+    document.getElementById('mfa_EXPLAIN').classList.remove('active', 'list-group-item-info');
+
+    const explainer = document.getElementById('mfaExplainerBox');
+    if (branch === 'EXPLAIN') {
+      explainer.classList.remove('d-none');
+      document.getElementById('mfa_EXPLAIN').classList.add('active', 'list-group-item-info');
+    } else {
+      explainer.classList.add('d-none');
+      if (branch === 'COMPLIANT') {
+        document.getElementById('mfa_COMPLIANT').classList.add('active', 'list-group-item-success');
+      } else {
+        document.getElementById('mfa_PARTIAL').classList.add('active', 'list-group-item-warning');
+      }
+    }
+    answersObj['mfa_enforced'] = branch;
+  }
+
+  // --- World 2 Node 3: Passwords ---
+  function selectPasswordMethod(method, weight) {
+    document.getElementById('pwd_STICKY').classList.remove('active', 'list-group-item-danger');
+    document.getElementById('pwd_EXCEL').classList.remove('active', 'list-group-item-warning');
+    document.getElementById('pwd_MANAGER').classList.remove('active', 'list-group-item-success');
+
+    const card = document.getElementById('pwd_' + method);
+    if (method === 'STICKY') card.classList.add('active', 'list-group-item-danger');
+    if (method === 'EXCEL') card.classList.add('active', 'list-group-item-warning');
+    if (method === 'MANAGER') card.classList.add('active', 'list-group-item-success');
+
+    answersObj['password_storage'] = method;
+    answersObj['compliance_weight'] = weight;
+  }
+
+  // --- World 3 Node 1: EDR Toggle ---
+  function toggleW3End01(feature) {
+    const av = document.getElementById('w3_av');
+    const edr = document.getElementById('w3_edr');
+    const fw = document.getElementById('w3_fw');
+    if (av) av.classList.remove('selected');
+    if (edr) edr.classList.remove('selected');
+    if (fw) fw.classList.remove('selected');
+    
+    const target = document.getElementById('w3_' + feature.toLowerCase());
+    if (target) target.classList.add('selected');
+    
+    answersObj['edr_status'] = (feature === 'EDR') ? 'EDR_COMPLIANT' : 'EDR_NONE';
+    answersObj['selected_feature'] = feature;
+  }
+  
+  function updateITStaffEDR() {
+    const provider = document.getElementById('edr_provider').value;
+    const version = document.getElementById('edr_agent_version').value;
+    if (provider) {
+      answersObj['edr_status'] = 'EDR_COMPLIANT';
+      answersObj['edr_provider'] = provider;
+      answersObj['edr_agent_version'] = version;
+    } else {
+      answersObj['edr_status'] = 'EDR_NONE';
+    }
+  }
+
+  // --- World 3 Node 2: Patch SLA ---
+  function selectPatchSLA(sla) {
+    const slow = document.getElementById('sla_slow');
+    const std = document.getElementById('sla_std');
+    const fast = document.getElementById('sla_fast');
+    if (slow) slow.classList.remove('selected');
+    if (std) std.classList.remove('selected');
+    if (fast) fast.classList.remove('selected');
+    
+    const target = document.getElementById('sla_' + (sla === 'slow_turtle' ? 'slow' : (sla === 'standard' ? 'std' : 'fast')));
+    if (target) target.classList.add('selected');
+    
+    answersObj['patch_sla'] = sla;
+  }
+
+  function updateSlaRange(key, val) {
+    const display = document.getElementById('val_' + key);
+    if (display) display.innerText = val + ' Days';
+    answersObj[key] = val;
+    if (key === 'critical_sla') {
+      if (parseInt(val) <= 14) {
+        answersObj['patch_sla'] = 'fast_remediation';
+      } else {
+        answersObj['patch_sla'] = 'slow_turtle';
+      }
+    }
+  }
+
+  // --- World 3 Node 3: Admin Rights ---
+  function selectAdminRights(rights) {
+    const unrestricted = document.getElementById('adm_unrestricted');
+    const standard = document.getElementById('adm_standard');
+    if (unrestricted) unrestricted.classList.remove('selected');
+    if (standard) standard.classList.remove('selected');
+    
+    const target = document.getElementById('adm_' + rights);
+    if (target) target.classList.add('selected');
+    answersObj['admin_rights'] = rights;
+  }
+
+  // --- World 4 Node 1: Sorting Game ---
+  let selectedSortItemId = null;
+  let selectedSortCategory = null;
+  function selectSortItem(id, cat) {
+    const card = document.getElementById('sort_card');
+    const code = document.getElementById('sort_code');
+    const pitch = document.getElementById('sort_pitch');
+    if (card) card.classList.remove('bg-primary');
+    if (code) code.classList.remove('bg-primary');
+    if (pitch) pitch.classList.remove('bg-primary');
+    
+    const target = document.getElementById(id);
+    if (target) target.classList.add('bg-primary');
+    selectedSortItemId = id;
+    selectedSortCategory = cat;
+  }
+  
+  function placeSortedItem(targetCat) {
+    if (!selectedSortItemId) {
+      alert("Select a document badge first!");
+      return;
+    }
+    if (targetCat === selectedSortCategory) {
+      const placed = document.getElementById('placed_' + targetCat);
+      const item = document.getElementById(selectedSortItemId);
+      if (placed && item) {
+        placed.innerText = "✅ " + item.innerText;
+        item.classList.add('d-none');
+      }
+      answersObj['sorted_' + selectedSortCategory] = true;
+      selectedSortItemId = null;
+      selectedSortCategory = null;
+    } else {
+      alert("Oops! That document doesn't belong in that security chest. Keep trying!");
+    }
+  }
+
+  function updateClassificationMatrix() {
+    answersObj['class_cust'] = document.getElementById('class_cust').value;
+    answersObj['owner_cust'] = document.getElementById('owner_cust').value;
+    answersObj['ret_cust'] = document.getElementById('ret_cust').value;
+    answersObj['class_emp'] = document.getElementById('class_emp').value;
+    answersObj['owner_emp'] = document.getElementById('owner_emp').value;
+    answersObj['ret_emp'] = document.getElementById('ret_emp').value;
+  }
+
+  // --- World 4 Node 2: Vault Locks ---
+  function selectVaultLock(lock) {
+    const plain = document.getElementById('lock_plain');
+    const std = document.getElementById('lock_std');
+    const secure = document.getElementById('lock_secure');
+    if (plain) plain.classList.remove('selected');
+    if (std) std.classList.remove('selected');
+    if (secure) secure.classList.remove('selected');
+    
+    let suffix = 'plain';
+    if (lock === 'REST_STANDARD') suffix = 'std';
+    if (lock === 'REST_ENCRYPTED') suffix = 'secure';
+    
+    const target = document.getElementById('lock_' + suffix);
+    if (target) target.classList.add('selected');
+    
+    answersObj['vault_encryption'] = lock;
+  }
+
+  function updateITStaffCrypto() {
+    const alg = document.getElementById('crypto_alg').value;
+    const kms = document.getElementById('kms_provider').value;
+    const rot = document.getElementById('key_rotation_cycle').value;
+    answersObj['crypto_alg'] = alg;
+    answersObj['kms_provider'] = kms;
+    answersObj['key_rotation_cycle'] = rot;
+    
+    if (alg === 'AES_256_GCM') {
+      answersObj['vault_encryption'] = 'REST_ENCRYPTED';
+    } else {
+      answersObj['vault_encryption'] = 'REST_PLAINTEXT';
+    }
+  }
+
+  // --- World 4 Node 3: Transit Carriers ---
+  function selectTransitCarrier(secure) {
+    const unsecure = document.getElementById('carrier_unsecure');
+    const secureCard = document.getElementById('carrier_secure');
+    if (unsecure) unsecure.classList.remove('selected');
+    if (secureCard) secureCard.classList.remove('selected');
+    
+    const suffix = (secure === 'true') ? 'secure' : 'unsecure';
+    const target = document.getElementById('carrier_' + suffix);
+    if (target) target.classList.add('selected');
+    
+    answersObj['transit_compliant'] = secure;
+  }
+
+  // --- General simple key-value saver ---
+  function saveSelection(key, val) {
+    answersObj[key] = val;
+  }
+
+  // --- IT Staff drag and drop simulation ---
+  function triggerFileSelect() {
+    document.getElementById('fileInput').click();
+  }
+
+  function simulateFileParse(file) {
+    if (!file) return;
+    const feedback = document.getElementById('uploadFeedback');
+    feedback.classList.remove('d-none');
+    feedback.innerHTML = `<strong>🔄 Parsing ${file.name}...</strong>`;
+    
+    setTimeout(() => {
+      feedback.className = "mt-3 alert alert-success border-0 small";
+      feedback.innerHTML = `<strong>✅ Successfully Parsed operational asset tracking ledger!</strong><br>Parsed 47 assets. Validated configuration against AST-01 and AST-04 control references. File signature logged to MongoEngine audit schema.`;
+      answersObj['uploaded_file'] = file.name;
+      answersObj['parsed_assets_count'] = 47;
+    }, 1500);
+  }
+
+  // --- Compile answers on submit ---
+  function compileAnswersBeforeSubmit(e) {
+    // Collect any generic IT form answers
+    const toggle_it = document.querySelectorAll('input[name="toggle_it"]');
+    if (toggle_it.length > 0) {
+      toggle_it.forEach(t => {
+        answersObj[t.id] = t.checked;
+      });
+    }
+
+    // IT Staff mappings for Worlds 5-8
+    const ep_firewall = document.getElementById('enforce_perimeter_firewall');
+    if (ep_firewall) {
+      answersObj['firewall_status'] = ep_firewall.checked ? 'FIREWALL_COMPLIANT' : 'FIREWALL_NONE';
+    }
+    const guest_vlan = document.getElementById('isolate_guest_vlan');
+    if (guest_vlan) {
+      answersObj['wifi_status'] = guest_vlan.checked ? 'segmented_secure' : 'open_bridge';
+    }
+    const imm_audit = document.getElementById('immutable_audit_logs');
+    if (imm_audit) {
+      answersObj['logbook_status'] = imm_audit.checked ? 'immutable_vault' : 'LOGBOOK_NONE';
+    }
+    const rpo_range = document.querySelector('input[type="range"]');
+    if (rpo_range && rpo_range.id === 'rpo_target') {
+      const val = parseInt(rpo_range.value, 10);
+      answersObj['backup_status'] = (val <= 24) ? 'isolated_capsule' : 'BACKUP_NONE';
+    } else {
+      // Just a fallback in case
+      const rpo_input = document.getElementById('rpo_target');
+      if (rpo_input) {
+        answersObj['backup_status'] = (parseInt(rpo_input.value, 10) <= 24) ? 'isolated_capsule' : 'BACKUP_NONE';
+      }
+    }
+
+    const matrix_saas = document.querySelector('input[name="matrix_saas"]:checked');
+    if (matrix_saas) answersObj['matrix_saas'] = matrix_saas.value;
+    const matrix_buckets = document.querySelector('input[name="matrix_buckets"]:checked');
+    if (matrix_buckets) answersObj['matrix_buckets'] = matrix_buckets.value;
+    const matrix_vpc = document.querySelector('input[name="matrix_vpc"]:checked');
+    if (matrix_vpc) answersObj['matrix_vpc'] = matrix_vpc.value;
+
+    const mfa_admin = document.querySelector('input[name="mfa_admin"]:checked');
+    if (mfa_admin) answersObj['mfa_admin'] = mfa_admin.value;
+    const mfa_vpn = document.querySelector('input[name="mfa_vpn"]:checked');
+    if (mfa_vpn) answersObj['mfa_vpn'] = mfa_vpn.value;
+    const mfa_user = document.querySelector('input[name="mfa_user"]:checked');
+    if (mfa_user) answersObj['mfa_user'] = mfa_user.value;
+
+    const base_1 = document.getElementById('baseline_1');
+    if (base_1) answersObj['baseline_1'] = base_1.value;
+    const base_2 = document.getElementById('baseline_2');
+    if (base_2) answersObj['baseline_2'] = base_2.value;
+    const base_3 = document.getElementById('baseline_3');
+    if (base_3) answersObj['baseline_3'] = base_3.value;
+
+    const min_len = document.getElementById('min_length');
+    if (min_len) answersObj['min_length'] = min_len.value;
+    const rot_days = document.getElementById('rotation_days');
+    if (rot_days) answersObj['rotation_days'] = rot_days.value;
+    const comp = document.getElementById('complexity');
+    if (comp) answersObj['complexity'] = comp.value;
+
+    // Stringify and store in the form
+    document.getElementById('answers_json').value = JSON.stringify(answersObj);
+  }
+</script>
+{% endblock %}

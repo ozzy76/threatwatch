@@ -1,0 +1,616 @@
+<div class="row g-4" style="font-family: var(--ec-font-body);">
+  
+  <!-- LEFT SIDEBAR: HUD (Global Compliance Ledger) -->
+  <div class="col-xl-3 col-lg-4">
+    <div class="card ec-card p-4 shadow-lg sticky-top" style="top: 24px; background-color: #ffffff !important;">
+      <div class="text-center mb-4 pb-3 border-bottom border-light">
+        <div class="avatar-ring mb-3" style="width: 70px; height: 70px; border-radius: 50%; border: 2.5px solid var(--ec-charcoal); background-color: var(--ec-canvas); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+          <span class="fs-1">🛡️</span>
+        </div>
+        <h4 class="ec-title fw-extrabold mb-1" style="font-size: 1.3rem;">{{ user.company_name }}</h4>
+        <span class="badge bg-dark rounded-pill px-3 py-1 ec-title" style="font-size: 0.75rem;">{{ user.active_persona_display }}</span>
+      </div>
+
+      <!-- Ledger Progress Metrics -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <small class="text-uppercase fw-bold text-muted" style="font-size: 0.75rem;">Defensive Standing</small>
+          <span class="fw-bold text-success ec-mono" style="color: var(--ec-secure) !important;">{{ user.current_progress_percentage }}%</span>
+        </div>
+        <div class="progress" style="height: 12px; border-radius: 10px; border: 2px solid var(--ec-charcoal); overflow: hidden;">
+          <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ user.current_progress_percentage }}%; background-color: var(--ec-secure) !important;" aria-valuenow="{{ user.current_progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+
+      <!-- Security Gems Balance -->
+      <div class="p-3 mb-4 rounded-3 d-flex align-items-center justify-content-between" style="border: 2.5px solid var(--ec-charcoal); background-color: #fffdf0; box-shadow: 4px 4px 0px 0px var(--ec-charcoal);">
+        <div>
+          <small class="text-uppercase fw-bold text-muted d-block" style="font-size: 0.7rem; font-family: var(--ec-font-title);">Security Gems</small>
+          <span class="h2 fw-extrabold mb-0 ec-mono" id="gemBalance">{{ user.security_gems_balance }}</span>
+        </div>
+        <div class="gem-icon animate-pulse" style="font-size: 2.2rem; animation: pulseScale 1.5s infinite ease-in-out;">💎</div>
+      </div>
+
+      <!-- Sentry Mascot Quick Interaction -->
+      <div class="mb-4 p-3 rounded-3" style="border: 2.5px solid var(--ec-charcoal); background-color: #f6f8fa;">
+        <div class="d-flex align-items-center mb-2">
+          <div style="font-size: 1.5rem;" class="animate-bounce">🤖</div>
+          <h6 class="ec-title mb-0 ms-2" style="font-size: 0.9rem;">Sentry Drone Helper</h6>
+        </div>
+        <div class="small text-muted" id="sentry-speech-text" style="font-size: 0.8rem; line-height: 1.35;">
+          Hello! I'm monitoring our network conduits. Click "Command Center" below to audit real-time telemetry streams, or quest through sectors to secure the city!
+        </div>
+      </div>
+
+      <!-- Badges Showcase -->
+      <div class="mb-4">
+        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 0.75rem;">Earned Medallions</small>
+        {% if user.earned_badges %}
+          <div class="d-flex flex-wrap gap-2">
+            {% for badge in user.earned_badges %}
+              <span class="badge d-flex align-items-center gap-1 py-1.5 px-3 rounded-pill badge-mushroom ec-title" style="font-size: 0.75rem; box-shadow: 2px 2px 0px 0px var(--ec-charcoal);" title="{{ badge }}">
+                🎖️ {{ badge }}
+              </span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="small text-muted italic" style="font-size: 0.75rem;">Complete quests and audit domains to unlock glowing security medallions!</p>
+        {% endif %}
+      </div>
+
+      <!-- Action Button to exit/command-center -->
+      <div class="mt-2 pt-3 border-top border-light text-center">
+        <button id="exit-campaign-btn" class="btn btn-ec-primary w-100 mb-2 shadow-sm" style="box-shadow: 3px 3px 0px 0px var(--ec-warning) !important;">
+          📊 Command Center Mode
+        </button>
+        <a href="{% url 'gamification:reset_quest' %}" class="btn btn-sm text-danger fw-bold d-block mt-2" onclick="return confirm('Are you sure you want to reset all compliance quest progress? This cannot be undone.');" style="font-size: 0.75rem;">🔄 Reset Progress</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT CONTENT: MAP CAMPAIGNS -->
+  <div class="col-xl-9 col-lg-8">
+    
+    <!-- HEADER AREA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="ec-title mb-1" style="font-size: 2.2rem; color: #ffffff; text-shadow: 3px 3px 0px var(--ec-charcoal);">The Campaign Overworld</h1>
+        <p class="text-white fw-bold mb-0" style="text-shadow: 1px 1px 2px var(--ec-charcoal);">Quest through the 8 Sectors of the Secure Controls Framework</p>
+      </div>
+    </div>
+
+    <!-- WORLDS 1 TO 8 SEQUENCE -->
+    
+    <!-- SECTOR 1: AST (Asset Management) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 map-w1" style="background: linear-gradient(135deg, #eef9ff, #ffffff) !important;">
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-primary text-white ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 1</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 1: The Physical Realm & Cloud Grid</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>AST (Asset Management)</strong></p>
+        </div>
+        <span class="fs-1 animate-bounce">🏙️</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #9fc1ff 0%, #5C94FC 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-warning)" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W1_AST_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          <a href="{% url 'gamification:node_play' 'W1_AST_01' %}" class="overworld-node-anchor">
+            <span>🖥️</span>
+            <span class="overworld-node-tooltip">1. Physical Grid</span>
+          </a>
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W1_AST_02' in completions %}completed{% elif 'W1_AST_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W1_AST_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W1_AST_02' %}" class="overworld-node-anchor">
+              <span>☁️</span>
+              <span class="overworld-node-tooltip">2. Cloud Sky-Rises</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 3 -->
+        <div class="overworld-node {% if 'W1_AST_03' in completions %}completed{% elif 'W1_AST_02' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if 'W1_AST_02' in completions %}
+            <a href="{% url 'gamification:node_play' 'W1_AST_03' %}" class="overworld-node-anchor">
+              <span>📦</span>
+              <span class="overworld-node-tooltip">3. Operational Inventory</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w1_boss_beaten %}completed{% elif w1_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 880px; top: 220px;">
+          {% if w1_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_1' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>👑</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: City Census</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 2: IAC (Identity and Access Control) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 map-w2 {% if not w2_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #11141a, #1a2230) !important; color: white !important;">
+      {% if not w2_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 2 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete Sector 1's City Census Boss Fight to unlock the Identity Fortress gates.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-info text-dark ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 2</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem; color: #00ffff !important;">Sector 2: Identity & Access Citadel</h2>
+          <p class="text-white-50 small mb-0">SCF Core Controls: <strong>IAC (Identity and Access Control)</strong></p>
+        </div>
+        <span class="fs-1">🚪</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: #090e16; border-color: #00ffff;">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#223a47" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#00ffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="8, 8" class="path-animate-neon"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W2_IAC_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w2_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W2_IAC_01' %}" class="overworld-node-anchor">
+              <span>🆔</span>
+              <span class="overworld-node-tooltip">1. Gatekeeper Roll Call</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W2_IAC_02' in completions %}completed{% elif 'W2_IAC_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W2_IAC_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W2_IAC_02' %}" class="overworld-node-anchor">
+              <span>🔑</span>
+              <span class="overworld-node-tooltip">2. Biometric Control</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 3 -->
+        <div class="overworld-node {% if 'W2_IAC_03' in completions %}completed{% elif 'W2_IAC_02' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if 'W2_IAC_02' in completions %}
+            <a href="{% url 'gamification:node_play' 'W2_IAC_03' %}" class="overworld-node-anchor">
+              <span>🔐</span>
+              <span class="overworld-node-tooltip">3. The Vault Locks</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w2_boss_beaten %}completed{% elif w2_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 880px; top: 220px;">
+          {% if w2_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_2' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>🚨</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Breach Simulator</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 3: END (Endpoint Security) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 map-w3 {% if not w3_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #f7f9fa, #eef1f3) !important;">
+      {% if not w3_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 3 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete Sector 2's Security Breach Boss Fight to unlock Endpoint Armor Canopy.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-success text-white ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 3</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 3: Endpoint Armor Canopy</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>END (Endpoint Security)</strong></p>
+        </div>
+        <span class="fs-1">🛡️</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #a5d6a7 0%, #2e7d32 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#ffe082" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W3_END_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w3_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W3_END_01' %}" class="overworld-node-anchor">
+              <span>🛡️</span>
+              <span class="overworld-node-tooltip">1. Grid Armor</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W3_END_02' in completions %}completed{% elif 'W3_END_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W3_END_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W3_END_02' %}" class="overworld-node-anchor">
+              <span>🔨</span>
+              <span class="overworld-node-tooltip">2. The Patch Forge</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 3 -->
+        <div class="overworld-node {% if 'W3_END_03' in completions %}completed{% elif 'W3_END_02' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if 'W3_END_02' in completions %}
+            <a href="{% url 'gamification:node_play' 'W3_END_03' %}" class="overworld-node-anchor">
+              <span>👑</span>
+              <span class="overworld-node-tooltip">3. Crown Permissions</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w3_boss_beaten %}completed{% elif w3_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 880px; top: 220px;">
+          {% if w3_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_3' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>🛸</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Airship Attack</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 4: DAT (Data Protection & Privacy) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 map-w4 {% if not w4_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #1b1612, #2d2019) !important; color: white !important;">
+      {% if not w4_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 4 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete Sector 3's Airship Attack Boss Fight to unlock Underground Treasure Vault.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-warning text-dark ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 4</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem; color: #ffcc00 !important;">Sector 4: Underground Treasure Vault</h2>
+          <p class="text-white-50 small mb-0">SCF Core Controls: <strong>DAT (Data Protection / CRY / PRI)</strong></p>
+        </div>
+        <span class="fs-1">📦</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: #140d0b; border-color: var(--ec-warning);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#4a2818" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-warning)" stroke-width="3" stroke-linecap="round" stroke-dasharray="6, 12" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W4_DAT_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w4_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W4_DAT_01' %}" class="overworld-node-anchor">
+              <span>📦</span>
+              <span class="overworld-node-tooltip">1. Asset Classification</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W4_DAT_02' in completions %}completed{% elif 'W4_DAT_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W4_DAT_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W4_DAT_02' %}" class="overworld-node-anchor">
+              <span>🗝️</span>
+              <span class="overworld-node-tooltip">2. Static Encryption</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 3 -->
+        <div class="overworld-node {% if 'W4_DAT_03' in completions %}completed{% elif 'W4_DAT_02' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if 'W4_DAT_02' in completions %}
+            <a href="{% url 'gamification:node_play' 'W4_DAT_03' %}" class="overworld-node-anchor">
+              <span>🏇</span>
+              <span class="overworld-node-tooltip">3. Pipeline Protection</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w4_boss_beaten %}completed{% elif w4_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 880px; top: 220px;">
+          {% if w4_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_4' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>🎭</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Data Heist</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+
+    <!-- SECTORS 5 TO 8 (EXPANDED DYNAMIC WORLDS) -->
+
+    <!-- SECTOR 5: NET (Network Conduits) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 {% if not w5_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #f4fcfa, #e0f2f1) !important;">
+      {% if not w5_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 5 Locked</h4>
+          <p class="text-white-50 max-w-sm">Defeat the Sector 4 Data Heist Boss to unlock the Pipeline Network Conduits.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-teal text-white ec-title px-3 py-1.5 mb-2" style="background-color: #008080 !important; border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 5</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 5: Subterranean Pipeline conduits</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>NET / CHS / WLS / CM (Network Boundaries)</strong></p>
+        </div>
+        <span class="fs-1">🧪</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #80cbc4 0%, #00695c 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#24C854" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W5_NET_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w5_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W5_NET_01' %}" class="overworld-node-anchor">
+              <span>⚡</span>
+              <span class="overworld-node-tooltip">1. Boundary Routing Filters</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W5_NET_02' in completions %}completed{% elif 'W5_NET_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W5_NET_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W5_NET_02' %}" class="overworld-node-anchor">
+              <span>📶</span>
+              <span class="overworld-node-tooltip">2. Wi-Fi Drawbridge</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w5_boss_beaten %}completed{% elif w5_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if w5_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_5' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>⛈️</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: DDoS Storm</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 6: GOV (Sentry Academy & Governance) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 {% if not w6_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #fffde7, #fff9c4) !important;">
+      {% if not w6_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 6 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete the DDoS Storm Boss Fight to unlock the Sentry Training Academy.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-warning text-dark ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 6</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 6: Sentry Training Academy</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>GOV / RM / SAT / PPL (Governance Training)</strong></p>
+        </div>
+        <span class="fs-1">🎓</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #ffe082 0%, #ff8f00 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-white)" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W6_SAT_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w6_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W6_SAT_01' %}" class="overworld-node-anchor">
+              <span>🎯</span>
+              <span class="overworld-node-tooltip">1. Sentry Boot Camp</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W6_GOV_02' in completions %}completed{% elif 'W6_SAT_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W6_SAT_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W6_GOV_02' %}" class="overworld-node-anchor">
+              <span>📜</span>
+              <span class="overworld-node-tooltip">2. Administrative Directives</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w6_boss_beaten %}completed{% elif w6_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if w6_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_6' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>👔</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Compliance Audit Showdown</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 7: MON (Watchtowers and Active Monitoring) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 {% if not w7_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7) !important;">
+      {% if not w7_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 7 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete the Compliance Audit Showdown to unlock Sentry Watchtowers.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-purple text-white ec-title px-3 py-1.5 mb-2" style="background-color: #8a2be2 !important; border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 7</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 7: Sentry Watchtowers</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>MON / A&A / THR / RS (Continuous Monitoring)</strong></p>
+        </div>
+        <span class="fs-1">📡</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #ce93d8 0%, #4a148c 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 Q 280 250 440 180 T 760 180" fill="none" stroke="#FFCC00" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W7_VPM_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w7_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W7_VPM_01' %}" class="overworld-node-anchor">
+              <span>📡</span>
+              <span class="overworld-node-tooltip">1. Sentry Array Deployment</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Node 2 -->
+        <div class="overworld-node {% if 'W7_MON_02' in completions %}completed{% elif 'W7_VPM_01' in completions %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if 'W7_VPM_01' in completions %}
+            <a href="{% url 'gamification:node_play' 'W7_MON_02' %}" class="overworld-node-anchor">
+              <span>📔</span>
+              <span class="overworld-node-tooltip">2. Central Log Archive</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w7_boss_beaten %}completed{% elif w7_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 760px; top: 180px;">
+          {% if w7_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_7' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>🎥</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Log Dashboard Reveal</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTOR 8: CRT (Incident Recovery & Continuity Center) -->
+    <div class="card ec-card p-4 p-md-5 mb-5 {% if not w8_unlocked %}locked-map-gray{% endif %}" style="background: linear-gradient(135deg, #ffebee, #ffcdd2) !important;">
+      {% if not w8_unlocked %}
+        <div class="locked-map-overlay d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="fs-1 mb-2">🔒</span>
+          <h4 class="ec-title fw-extrabold text-white">Sector 8 Locked</h4>
+          <p class="text-white-50 max-w-sm">Complete Log Dashboard Reveal to unlock the Continuity Center.</p>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <span class="badge bg-danger text-white ec-title px-3 py-1.5 mb-2" style="border: 2px solid var(--ec-charcoal); border-radius: 20px; font-size: 0.8rem;">World 8</span>
+          <h2 class="ec-title fw-extrabold mb-1" style="font-size: 1.6rem;">Sector 8: Disaster Recovery capsules</h2>
+          <p class="text-muted small mb-0">SCF Core Controls: <strong>DRP / BCP / IR / OPS (Resilience Continuity)</strong></p>
+        </div>
+        <span class="fs-1">🧬</span>
+      </div>
+
+      <div class="overworld-canvas position-relative" style="background: radial-gradient(circle at center, #ef9a9a 0%, #b71c1c 100%);">
+        <svg class="overworld-path" width="100%" height="100%">
+          <path d="M 120 180 L 440 180 T 760 180" fill="none" stroke="var(--ec-charcoal)" stroke-width="6" stroke-linecap="round"></path>
+          <path d="M 120 180 L 440 180 T 760 180" fill="none" stroke="#E52521" stroke-width="3" stroke-linecap="round" stroke-dasharray="10, 10" class="path-animate-gold"></path>
+        </svg>
+
+        <!-- Node 1 -->
+        <div class="overworld-node {% if 'W8_DRP_01' in completions %}completed{% else %}active-pulse{% endif %}" style="left: 120px; top: 180px;">
+          {% if w8_unlocked %}
+            <a href="{% url 'gamification:node_play' 'W8_DRP_01' %}" class="overworld-node-anchor">
+              <span>🧬</span>
+              <span class="overworld-node-tooltip">1. Isolated Backup Capsules</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+
+        <!-- Boss Fight -->
+        <div class="overworld-node {% if w8_boss_beaten %}completed{% elif w8_boss_unlocked %}active-pulse{% else %}locked{% endif %}" style="left: 440px; top: 180px;">
+          {% if w8_boss_unlocked %}
+            <a href="{% url 'gamification:boss_fight' 'world_8' %}" class="overworld-node-anchor" style="background-color: var(--ec-breached); border-color: var(--ec-charcoal); color: white;">
+              <span>👹</span>
+              <span class="overworld-node-tooltip text-danger fw-bold">Boss: Ransomware Invasion</span>
+            </a>
+          {% else %}
+            <div class="overworld-node-anchor">🔒</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Select Your Persona - Security Quest{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-extrabold text-black mb-2 animate-fade-in">🛡️ Select Your Persona</h1>
+    <p class="lead text-muted max-w-2xl mx-auto">
+      Customize your Security Quest experience. Choose the path that matches your role to get tailored interactive exercises, customized compliance metrics, and helpful compliance guides.
+    </p>
+  </div>
+
+  <form method="POST" id="personaForm">
+    {% csrf_token %}
+    <input type="hidden" name="persona" id="selectedPersona" value="">
+
+    <div class="row justify-content-center g-4">
+      <!-- Business Owner Card -->
+      <div class="col-md-5">
+        <div class="card h-100 persona-card border-2 text-center p-4 cursor-pointer" onclick="selectPersona('BUSINESS_OWNER')" id="card_BUSINESS_OWNER">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <div class="icon-wrapper mb-4 bg-light-green mx-auto">
+                <span class="fs-1">👔</span>
+              </div>
+              <h3 class="card-title fw-bold mb-3 text-black">Business Owner</h3>
+              <p class="card-text text-muted">
+                Keep security simple, friendly, and practical. Get simple sliders, visual guides, helpful explainers, and celebratory milestones as we lock down your company's digital gates.
+              </p>
+            </div>
+            <div class="mt-4">
+              <span class="btn btn-outline-dark rounded-pill select-btn">Choose Business Owner</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IT Staff Card -->
+      <div class="col-md-5">
+        <div class="card h-100 persona-card border-2 text-center p-4 cursor-pointer" onclick="selectPersona('IT_STAFF')" id="card_IT_STAFF">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <div class="icon-wrapper mb-4 bg-light-blue mx-auto">
+                <span class="fs-1">💻</span>
+              </div>
+              <h3 class="card-title fw-bold mb-3 text-black">IT Staff / Tech Lead</h3>
+              <p class="card-text text-muted">
+                Get down into the engine room. Access CSV drag-and-drop parsers, technical security matrices, command-line guides, and detailed control auditing parameters.
+              </p>
+            </div>
+            <div class="mt-4">
+              <span class="btn btn-outline-dark rounded-pill select-btn">Choose IT Staff</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .persona-card {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-color: var(--bi-border-color) !important;
+    background-color: var(--bi-card-bg) !important;
+  }
+  .persona-card:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    border-color: var(--bi-accent-black) !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+  }
+  .persona-card.selected {
+    border-color: var(--bi-accent-green) !important;
+    background: linear-gradient(145deg, #ffffff, #fdfdfd) !important;
+    box-shadow: 0 10px 25px rgba(164, 208, 55, 0.2) !important;
+  }
+  .persona-card.selected .select-btn {
+    background-color: var(--bi-accent-black) !important;
+    color: #fff !important;
+  }
+  .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+  .persona-card:hover .icon-wrapper {
+    transform: rotate(5deg) scale(1.1);
+  }
+  .bg-light-green {
+    background-color: #f1f8e9;
+    border: 1px solid #c5e1a5;
+  }
+  .bg-light-blue {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  function selectPersona(persona) {
+    document.getElementById('selectedPersona').value = persona;
+    
+    // Reset selections
+    document.getElementById('card_BUSINESS_OWNER').classList.remove('selected');
+    document.getElementById('card_IT_STAFF').classList.remove('selected');
+    
+    // Add selected class
+    document.getElementById('card_' + persona).classList.add('selected');
+    
+    // Smooth delay before submitting for dynamic response feeling
+    setTimeout(() => {
+      document.getElementById('personaForm').submit();
+    }, 400);
+  }
+</script>
+{% endblock %}
